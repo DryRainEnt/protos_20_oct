@@ -10,7 +10,7 @@ public class TilemapController : MonoBehaviour
     {
         mouseDelta = (Vector2)Input.mousePosition - mouseDelta;
 
-        if (Camera.main.orthographicSize > 10f)
+        if (Camera.main.orthographicSize > 20f || Input.mouseScrollDelta.y < 0f)
             Camera.main.orthographicSize += Input.mouseScrollDelta.y * -10f;
 
         if (Input.GetMouseButton(2))

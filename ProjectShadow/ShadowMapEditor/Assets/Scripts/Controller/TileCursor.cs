@@ -26,7 +26,9 @@ public class TileCursor : MonoBehaviour
         var wantedPos = Camera.main.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 10f));
         transform.position = wantedPos;
 
-        var pos = new Vector2(Mathf.FloorToInt(transform.position.x / 16), Mathf.FloorToInt(transform.position.y / 16));
+        var pos = transform.position;
+        if (!Input.GetKey(KeyCode.LeftShift)) pos = new Vector2(Mathf.FloorToInt(pos.x / 16), Mathf.FloorToInt(pos.y / 16));
+        else pos = new Vector2(pos.x / 16, pos.y / 16);
         sr.transform.position = new Vector3(pos.x * 16 + 8, pos.y * 16 + 8, -5);
         
         if (Input.GetMouseButtonDown(0) && IsPointerOverUIElement())

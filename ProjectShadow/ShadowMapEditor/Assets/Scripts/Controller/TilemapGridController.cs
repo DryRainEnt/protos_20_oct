@@ -10,6 +10,7 @@ public class TilemapGridController : MonoBehaviour
 
     public Material mat;
 
+    public Toggle firstLayer;
     public Toggle autoGen;
     public InputField MapName;
     public InputField Width;
@@ -26,6 +27,10 @@ public class TilemapGridController : MonoBehaviour
     public Tile shadowBox;
     public Tile greyBox;
 
+    public Tile lightBigBox;
+    public Tile shadowBigBox;
+    public Tile greyBigBox;
+
     public Tile door;
     public Tile key;
 
@@ -37,6 +42,13 @@ public class TilemapGridController : MonoBehaviour
     void Start()
     {
         instance = this;
+        layers = new List<Tilemap>();
+        for (int i = 0; i < 7; i++)
+        {
+            var layer = Instantiate(prefab, transform);
+            layer.gameObject.name = layerNames[i];
+            layers.Add(layer.GetComponent<Tilemap>());
+        }
     }
 
     public void Initiate()
@@ -58,6 +70,9 @@ public class TilemapGridController : MonoBehaviour
                         || j < TilemapBorder.instance.height / 16 * -0.5f + 1 || j > TilemapBorder.instance.height / 16 * 0.5f - 2)
                         SetTile(2, new Vector3(i, j), "GreyBlock");
         }
+
+        firstLayer.isOn = true;
+        TileCursor.instance.SetLayer(0);
     }
 
     public void Dispose()
@@ -79,7 +94,8 @@ public class TilemapGridController : MonoBehaviour
 
     public void SetTile(int layer, Vector2 pos, string type)
     {
-        Debug.Log(type);
+        if (pos.x < TilemapBorder.instance.width / 16 * -0.5f - 2f || pos.x > TilemapBorder.instance.width / 16 * 0.5f + 2f) return;
+        if (pos.y < TilemapBorder.instance.height / 16 * -0.5f - 2f || pos.y > TilemapBorder.instance.height / 16 * 0.5f + 2f) return;
         if (layer >= 10) layer -= 10;
         TileBase tile = null;
         bool eraser = false;
@@ -95,6 +111,9 @@ public class TilemapGridController : MonoBehaviour
             case "LightBox": tile = lightBox; break;
             case "ShadowBox": tile = shadowBox; break;
             case "GreyBox": tile = greyBox; break;
+            case "LightBigBox": tile = lightBigBox; break;
+            case "ShadowBigBox": tile = shadowBigBox; break;
+            case "GreyBigBox": tile = greyBigBox; break;
 
             case "Door": tile = door; break;
             case "Key": tile = key; break;

@@ -21,7 +21,7 @@ public class DoorBehaviour : MonoBehaviour
     Coroutine DoorEnterRoutine;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         sr = GetComponentInChildren<SpriteRenderer>();
         anim = GetComponentInChildren<Animator>();
@@ -42,7 +42,7 @@ public class DoorBehaviour : MonoBehaviour
                 DoorEnterStart(interactable.master);
                 interactable.EndInteract();
             }
-            else
+            else if (DoorOpenRoutine == null)
             {
                 interactable.StartInteract();
                 DoorOpenStart(interactable.master);
@@ -65,20 +65,29 @@ public class DoorBehaviour : MonoBehaviour
         yield return new WaitForSeconds(openTime);
         isOpen = true;
         DoorOpenRoutine = null;
-        interactable.faceInteract = false;
     }
 
     public void DoorEnterStart(CharacterBehaviour handler)
     {
         if (handler == WorldBehaviour.player)
-            DoorEnterRoutine = StartCoroutine(DoorEnter());
-    }
+        {
+            var targetStage = StageDoorPool.instance.stageDoorPool[GetComponent<ObjectBehaviour>().target];
+            var targetDoor = GetComponent<ObjectBehaviour>().target;
 
-    IEnumerator DoorEnter()
-    {
-        yield return new WaitForSeconds(Constants.door_enter_time);
-        isOpen = true;
-        DoorEnterRoutine = null;
-    }
+            if (!StageController.instance.stages[targetStage].activeInHierarchy)
+                StageController.instance.ActivateStage(targetStage);
 
+            WorldBehaviour.player.transform.position = GameObject.Find(targetDoor).transform.position + Vector3.up * 4;
+            var des = GameObject.Find(targetDoor).GetComponent<DoorBehaviour>();
+            des.isOpen = true;
+            des.anim.SetTrigger("OpenImmediate");
+
+            if (targetStage != StageController.instance.currentStage)
+            {
+                StageController.instance.SetCurrentStage(targetStage);
+            }
+
+        }
+    }
+    
 }

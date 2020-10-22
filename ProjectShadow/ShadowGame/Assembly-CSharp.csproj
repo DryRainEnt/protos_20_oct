@@ -82,11 +82,14 @@
     <Compile Include="Assets\Scripts\Utils\FXObjectPool.cs" />
     <Compile Include="Assets\Scripts\Utils\FXPooledObject.cs" />
     <Compile Include="Assets\Scripts\Utils\LimitedLifetime.cs" />
+    <Compile Include="Assets\Scripts\Utils\SerializableDictionary.cs" />
+    <Compile Include="Assets\Scripts\Utils\StageDoorPool.cs" />
     <Compile Include="Assets\Special FX Shaders\Scripts\LineRenderControl.cs" />
     <None Include="Assets\Special FX Shaders\Shaders\Special FX\Special FX Dissolve Distortion.shader" />
     <None Include="Assets\Special FX Shaders\Shaders\Special FX\Special FX Distortion Intersection.shader" />
     <None Include="Assets\Special FX Shaders\Shaders\Special FX\Special FX Dissolve.shader" />
     <None Include="Assets\Special FX Shaders\Shaders\Special FX\Special FX Distortion.shader" />
+    <None Include="Assets\StreamingAssets\stages.txt" />
     <None Include="Assets\Special FX Shaders\Shaders\Special FX\Special FX Dissolve Intersection.shader" />
     <None Include="Assets\Special FX Shaders\Shaders\Special FX\Air Distortion\Air Distortion - Single.shader" />
     <None Include="Assets\Special FX Shaders\Shaders\Special FX\Air Distortion\Air Distortion - Double.shader" />

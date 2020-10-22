@@ -28,8 +28,24 @@ public class DataController : MonoBehaviour
         grid.Height.text = currentMap.Height.ToString();
     }
 
+    public void CleanUpLayer(Layer layer)
+    {
+        List<Token> removeList = new List<Token>();
+        foreach (Token token in layer.map)
+        {
+            if (token.type == "null") removeList.Add(token);
+            if (token.type == "Key") token.name = "Key";
+        }
+        foreach (Token token in removeList)
+        {
+            layer.map.Remove(token);
+        }
+    }
+
     public void SaveJson()
     {
+        foreach(Layer layer in currentMap.Layers())
+            CleanUpLayer(layer);
         WriteFile(Application.streamingAssetsPath, currentMap.Name + ".json", JsonUtility.ToJson(currentMap));
     }
 
@@ -55,22 +71,23 @@ public class DataController : MonoBehaviour
         TilemapBorder.instance.height = currentMap.Height;
     }
 
-    public void Add(int layer, Vector2 pos, string type)
+    public void Add(int layer, Vector2 pos, string type, string name = "", string target = "none")
     {
-        Layer target;
+        Layer targetLayer;
         switch (layer)
         {
-            case 0: target = currentMap.LightBlocks; break;
-            case 1: target = currentMap.ShadowBlocks; break;
-            case 2: target = currentMap.GreyBlocks; break;
-            case 3: target = currentMap.LightLadders; break;
-            case 4: target = currentMap.ShadowLadders; break;
-            case 5: target = currentMap.GreyLadders; break;
-            default: target = currentMap.Gimmicks; break;
+            case 0: targetLayer = currentMap.LightBlocks; break;
+            case 1: targetLayer = currentMap.ShadowBlocks; break;
+            case 2: targetLayer = currentMap.GreyBlocks; break;
+            case 3: targetLayer = currentMap.LightLadders; break;
+            case 4: targetLayer = currentMap.ShadowLadders; break;
+            case 5: targetLayer = currentMap.GreyLadders; break;
+            default: targetLayer = currentMap.Gimmicks; break;
         }
         if (TilemapGridController.instance.GetTile(layer, pos))
             Remove(layer, pos);
-        target.map.Add(new Token(pos, type));
+        if (name == "") name = type;
+        targetLayer.map.Add(new Token(pos, type, name, target));
         TilemapGridController.instance.SetTile(layer, pos, type);
     }
 
@@ -185,6 +202,11 @@ public class MapData
         GreyLadders = new Layer();
         Gimmicks = new Layer();
     }
+
+    public Layer[] Layers()
+    {
+        return new Layer[7] { LightBlocks, ShadowBlocks, GreyBlocks, LightLadders, ShadowLadders, GreyLadders, Gimmicks };
+    }
 }
 
 [Serializable]
@@ -202,12 +224,25 @@ public class Layer
 [Serializable]
 public class Token
 {
+    public string name;
+    public string target;
     public int x;
     public int y;
     public string type;
 
     public Token(Vector2 pos, string type)
     {
+        this.name = type;
+        this.target = "none";
+        this.x = Mathf.FloorToInt(pos.x);
+        this.y = Mathf.FloorToInt(pos.y);
+        this.type = type;
+    }
+
+    public Token(Vector2 pos, string type, string name, string target = "none")
+    {
+        this.name = name;
+        this.target = target;
         this.x = Mathf.FloorToInt(pos.x);
         this.y = Mathf.FloorToInt(pos.y);
         this.type = type;

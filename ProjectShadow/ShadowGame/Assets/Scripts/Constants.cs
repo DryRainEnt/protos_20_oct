@@ -22,12 +22,24 @@ public static class Constants
         float area = Mathf.Abs((AA.x - AB.x) * (AA.y - AB.y));
 
         float overlap = Mathf.Abs(Mathf.Max(AA.x, BA.x) - Mathf.Min(AB.x, BB.x)) * Mathf.Abs(Mathf.Max(AA.y, BA.y) - Mathf.Min(AB.y, BB.y));
-        
+
         return overlap / area;
     }
 
-    public static Vector3 SetDepth (Vector3 v, float z = 0f)
+    public static Vector3 SetDepth(Vector3 v, float z = 0f)
     {
         return new Vector3(v.x, v.y, z);
+    }
+
+    public static string[] stages
+    {
+        get
+        {
+            return new string[2] {
+                    "ts1",
+                    "ts2"
+                };
+        }
+
     }
 }

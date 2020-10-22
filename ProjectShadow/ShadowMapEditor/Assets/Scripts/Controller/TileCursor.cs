@@ -12,6 +12,9 @@ public class TileCursor : MonoBehaviour
     public int targetLayer;
     bool tileControl = true;
 
+    public InputField tileName;
+    public InputField tileTarget;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -43,7 +46,7 @@ public class TileCursor : MonoBehaviour
 
         if (Input.GetMouseButton(0) && tileControl)
         {
-            DataController.instance.Add(targetLayer, pos, Tilename);
+            DataController.instance.Add(targetLayer, pos, Tilename, tileName.text, tileTarget.text);
         }
 
         if (Input.GetMouseButton(1) && tileControl)

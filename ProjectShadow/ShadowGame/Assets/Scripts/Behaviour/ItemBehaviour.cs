@@ -33,6 +33,7 @@ public class ItemBehaviour : MonoBehaviour
                     master = p;
                     isConsumed = true;
                     transform.localScale = Vector3.one * 0.5f;
+                    transform.SetParent(master.transform);
                 }
             }
         }

@@ -14,7 +14,6 @@ public class PlayerBehaviour : CharacterBehaviour
         WorldBehaviour.player = this;
         items = new List<ItemBehaviour>();
 
-        ResetPosition();
     }
 
     public void ResetPosition()
@@ -61,7 +60,7 @@ public class PlayerBehaviour : CharacterBehaviour
 
     public bool UseKey()
     {
-        var key = items.Find(x => x.name == "Key");
+        var key = items.Find(x => x.name.Contains("Key"));
         return UseItem(key);
     }
 }

@@ -1,12 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TilemapBorder : MonoBehaviour
 {
     public static TilemapBorder instance;
     public int width = 0;
     public int height = 0;
+
+    public InputField Width;
+    public InputField Height;
+
     static Material lineMaterial;
 
     LineRenderer lineRenderer;
@@ -27,6 +32,9 @@ public class TilemapBorder : MonoBehaviour
 
     void Update()
     {
+        int.TryParse(Width.text, out width);
+        int.TryParse(Height.text, out height);
+
         lineRenderer.SetPositions(
             new Vector3[] {
                 new Vector3(-width / 2, -height / 2, -3),

@@ -66,7 +66,7 @@ public class InteractableBehaviour : MonoBehaviour
                 if (d < dist)
                 {
                     dist = d;
-                    if (!master || (master && master.interact == null && (faceInteract && (master.sr.transform.localScale.x * (transform.position.x - master.transform.position.x) > 0f))))
+                    if (!master || (master && master.interact == null || (master && master.interact == null && faceInteract && (master.sr.transform.localScale.x * (transform.position.x - master.transform.position.x) > 0f))))
                     {
                         master = c;
                         SetInteractable();

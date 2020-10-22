@@ -11,7 +11,6 @@ public class TilemapGridController : MonoBehaviour
     public Material mat;
 
     public Toggle firstLayer;
-    public Toggle autoGen;
     public InputField MapName;
     public InputField Width;
     public InputField Height;
@@ -66,19 +65,19 @@ public class TilemapGridController : MonoBehaviour
             layers.Add(layer.GetComponent<Tilemap>());
         }
         
-        if (autoGen.isOn)
-        {
-            for (float i = TilemapBorder.instance.width / 16 * -0.5f - 2; i < TilemapBorder.instance.width / 16 * 0.5f + 2; i++)
-                for (float j = TilemapBorder.instance.height / 16 * -0.5f - 2; j < TilemapBorder.instance.height / 16 * 0.5f + 2; j++)
-                    if (i < TilemapBorder.instance.width / 16 * -0.5f + 1 || i > TilemapBorder.instance.width / 16 * 0.5f - 2
-                        || j < TilemapBorder.instance.height / 16 * -0.5f + 1 || j > TilemapBorder.instance.height / 16 * 0.5f - 2)
-                    {
-                        DataController.instance.Add(2, new Vector3(i, j), "GreyBlock");
-                    }
-        }
-
         firstLayer.isOn = true;
         TileCursor.instance.SetLayer(0);
+    }
+
+    public void GenerateBorder()
+    {
+        for (float i = TilemapBorder.instance.width / 16 * -0.5f - 2; i < TilemapBorder.instance.width / 16 * 0.5f + 2; i++)
+            for (float j = TilemapBorder.instance.height / 16 * -0.5f - 2; j < TilemapBorder.instance.height / 16 * 0.5f + 2; j++)
+                if (i < TilemapBorder.instance.width / 16 * -0.5f + 1 || i > TilemapBorder.instance.width / 16 * 0.5f - 2
+                    || j < TilemapBorder.instance.height / 16 * -0.5f + 1 || j > TilemapBorder.instance.height / 16 * 0.5f - 2)
+                {
+                    DataController.instance.Add(2, new Vector2(i, j), "GreyBlock");
+                }
     }
 
     public void Dispose()
@@ -130,12 +129,16 @@ public class TilemapGridController : MonoBehaviour
 
             case "null": eraser = true; break;
         }
+        var tilepos = new Vector3Int(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), -1);
         if (eraser)
         {
-            layers[layer].SetTile(new Vector3Int(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(layers[layer].transform.position.z)), null);
+            layers[layer].SetTile(tilepos, null);
             return;
         }
-        if (tile != null) layers[layer].SetTile(new Vector3Int(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(layers[layer].transform.position.z)), tile);
+        if (tile != null) layers[layer].SetTile(tilepos, tile);
+
+        layers[layer].RefreshTile(tilepos);
+        Debug.Log(string.Format("{0} >> [ {1}, {2}, {3} ]", layer, tilepos.x, tilepos.y, tilepos.z));
     }
 
     public void SetTilemapAlpha(int layer, bool alpha)

@@ -58,6 +58,14 @@ public class WorldBehaviour : MonoBehaviour
         RefreshObjects();
     }
     
+    public void TurnOnAllObjects()
+    {
+        foreach (ObjectBehaviour obj in objectShiftPool)
+        {
+            obj.gameObject.SetActive(true);
+        }
+    }
+    
     public void RefreshObjects()
     {
         foreach (ObjectBehaviour obj in objectShiftPool)

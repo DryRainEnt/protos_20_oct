@@ -77,7 +77,8 @@ MonoBehaviour:
   anim: {fileID: 0}
   col: {fileID: 0}
   targetStageName: 
-  openTime: 0
+  openTime: 2
+  isOpen: 0
 --- !u!114 &35502447502164903
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -94,6 +95,7 @@ MonoBehaviour:
   target: 0
   size: {x: 0, y: 0}
   fx_offset: 0
+  faceInteract: 1
   interactable: 0
   interactCall: 0
 --- !u!114 &35502447502164902
@@ -108,6 +110,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06db5375340b00e42ad4048c49ee9b82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  target: 
   isLight: 1
   isGrey: 0
 --- !u!1 &35502448231824532

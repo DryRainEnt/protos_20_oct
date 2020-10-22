@@ -7,7 +7,10 @@ using UnityEngine.Tilemaps;
 public class TilemapGridController : MonoBehaviour
 {
     public static TilemapGridController instance;
-    
+
+    public GameObject currentGrid;
+    public AT.SerializableDictionary.SerializableDictionary<string, GameObject> grids;
+
     public string MapName;
     public int Width;
     public int Height;
@@ -22,32 +25,28 @@ public class TilemapGridController : MonoBehaviour
     public GameObject prefab;
     public List<Tilemap> layers;
     public List<string> layerNames;
-    
-    // Start is called before the first frame update
-    void Start()
+
+    private void Awake()
     {
         instance = this;
         layers = new List<Tilemap>();
-        for (int i = 0; i < 7; i++)
-        {
-            if (!GameObject.Find(layerNames[i]))
-            {
-                var layer = Instantiate(prefab, transform);
-                layer.gameObject.name = layerNames[i];
-                layers.Add(layer.GetComponent<Tilemap>());
-            }
-            else
-                layers.Add(GameObject.Find(layerNames[i]).GetComponent<Tilemap>());
-        }
+        grids = new AT.SerializableDictionary.SerializableDictionary<string, GameObject>();
+    }
+
+    public void Initiate(GameObject stage)
+    {
+        var obj = Instantiate(Resources.Load<GameObject>(string.Concat("Prefabs/Parents/Grid")), Vector3.zero, Quaternion.identity, stage.transform);
+        grids.Add(stage.name, obj);
+        currentGrid = obj;
+        Initiate();
     }
 
     public void Initiate()
     {
-        if (layers.Count > 0) Dispose();
         layers = new List<Tilemap>();
         for (int i = 0; i < 7; i++)
         {
-            var layer = Instantiate(prefab, transform);
+            var layer = Instantiate(prefab, currentGrid.transform);
             layer.gameObject.name = layerNames[i];
             layers.Add(layer.GetComponent<Tilemap>());
             
@@ -57,6 +56,7 @@ public class TilemapGridController : MonoBehaviour
 
     public void Dispose()
     {
+        WorldBehaviour.instance.TurnOnAllObjects();
         for (int i = 0; i < 7; i++)
         {
             var layer = layers[i];
@@ -65,6 +65,7 @@ public class TilemapGridController : MonoBehaviour
         }
         layers.RemoveAll(x => x);
         layers.Clear();
+        WorldBehaviour.instance.RefreshObjects();
     }
 
     public TileBase GetTile(int layer, Vector2 pos)
@@ -72,7 +73,7 @@ public class TilemapGridController : MonoBehaviour
         return layers[layer]?.GetTile(new Vector3Int(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(layers[layer].transform.position.z)));
     }
 
-    public void SetTile(int layer, Vector2 pos, string type)
+    public void SetTile(int layer, Vector2 pos, string type, string name = "", string target = "none")
     {
         TileBase tile = null;
         bool isLight = false;
@@ -106,8 +107,15 @@ public class TilemapGridController : MonoBehaviour
             try
             {
                 var obj = Instantiate(Resources.Load<GameObject>(string.Concat("Prefabs/Gimmicks/", type)), pos * 16, Quaternion.identity, layers[layer].transform).GetComponent<ObjectBehaviour>();
+                obj.gameObject.name = name == "" ? type : name;
+                obj.target = target;
                 obj.isLight = isLight;
                 obj.isGrey = isGrey;
+
+                if (type.Contains("Door"))
+                {
+                    StageDoorPool.instance.stageDoorPool.Add(obj.gameObject.name, MapName);
+                }
             }
             catch(System.ArgumentException) { Debug.LogError(string.Concat("Prefabs/Gimmicks/", type)); }
         }

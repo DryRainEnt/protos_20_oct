@@ -5,9 +5,28 @@ using UnityEngine.SceneManagement;
 
 public class PlayerBehaviour : CharacterBehaviour
 {
+    public List<ItemBehaviour> items;
+
+    public DoorBehaviour lastDoor;
+
     private void Awake()
     {
         WorldBehaviour.player = this;
+        items = new List<ItemBehaviour>();
+
+        ResetPosition();
+    }
+
+    public void ResetPosition()
+    {
+        lastDoor = GameObject.Find("StartPoint").GetComponent<DoorBehaviour>();
+        if (lastDoor)
+        {
+            transform.position = lastDoor.transform.position;
+
+            if (WorldBehaviour.player.isLight != WorldBehaviour.instance.isLight) WorldBehaviour.instance.Shift();
+            else WorldBehaviour.instance.Distortion(transform);
+        }
     }
 
     public override void Update()
@@ -26,5 +45,23 @@ public class PlayerBehaviour : CharacterBehaviour
         WorldBehaviour.instance.Shift();
         isDead = false;
         DeadRoutine = null;
+    }
+
+    public void GetItem(ItemBehaviour item)
+    {
+        items.Add(item);
+    }
+
+    public bool UseItem(ItemBehaviour item)
+    {
+        if (!item) return false;
+        item.GetUsed();
+        return items.Remove(item);
+    }
+
+    public bool UseKey()
+    {
+        var key = items.Find(x => x.name == "Key");
+        return UseItem(key);
     }
 }

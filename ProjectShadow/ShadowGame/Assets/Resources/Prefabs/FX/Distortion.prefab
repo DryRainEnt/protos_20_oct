@@ -93,6 +93,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87fea8f77f0d1ac418d3a6026d566b53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  duration: 1
+  maxScale: 960
+  minScale: 16
 --- !u!114 &7260012219980204932
 MonoBehaviour:
   m_ObjectHideFlags: 0

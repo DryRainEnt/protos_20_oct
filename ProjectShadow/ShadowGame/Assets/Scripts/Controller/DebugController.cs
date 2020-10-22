@@ -14,11 +14,16 @@ public class DebugController : MonoBehaviour
     public InputField jumpPower;
     public InputField ladderSpeed;
 
+    public InputField stageName;
+
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.R))
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.R))
+        {
+            if (!StageController.instance.LoadStage(stageName.text))
+                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
 
         if (Input.GetKeyDown(KeyCode.Tab))
         {

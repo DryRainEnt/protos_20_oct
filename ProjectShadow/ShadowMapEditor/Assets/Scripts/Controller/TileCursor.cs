@@ -8,7 +8,7 @@ public class TileCursor : MonoBehaviour
 {
     public static TileCursor instance;
     SpriteRenderer sr;
-    string Tilename = "null";
+    public string Tilename = "null";
     public int targetLayer;
     bool tileControl = true;
 

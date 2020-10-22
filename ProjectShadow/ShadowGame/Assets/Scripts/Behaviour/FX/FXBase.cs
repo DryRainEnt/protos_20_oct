@@ -5,7 +5,8 @@ using UnityEngine;
 public class FXBase : MonoBehaviour
 {
     protected float timer;
-    protected float duration;
+    public float duration;
+    public float speed = 1f;
     protected Material mat;
     protected bool isOn;
     

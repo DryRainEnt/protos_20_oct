@@ -11,18 +11,12 @@ public class PushableBehaviour : MovableBehaviour
     float initDist;
 
     // Start is called before the first frame update
-    void Start()
+   public override void Start()
     {
-        sr = GetComponentInChildren<SpriteRenderer>();
-        anim = GetComponentInChildren<Animator>();
-        col = GetComponent<BoxCollider2D>();
+        base.Start();
+
         interactable = GetComponent<InteractableBehaviour>();
-
-        hspeed = 0f;
-        vspeed = 0f;
         initDist = 0f;
-
-        isDead = false;
     }
 
     // Update is called once per frame
@@ -43,12 +37,10 @@ public class PushableBehaviour : MovableBehaviour
             interactable.interactCall = 0f;
         }
 
-        if (master != null && !Constants.NearZero(master.hsum))
+        if (master != null)
         {
             hspeed = master.hsum * master.PushSlow;
         }
-        else
-            hspeed = 0f;
 
         base.Update();
 
@@ -57,7 +49,7 @@ public class PushableBehaviour : MovableBehaviour
             PushEnd();
         }
 
-        if (master && Constants.NearZero(master.hsum))
+        if ((master && (blocked[0] || blocked[1] || blocked[2])) || !master)
         {
             isPushable = false;
         }
@@ -73,8 +65,8 @@ public class PushableBehaviour : MovableBehaviour
                 if (!Constants.NearZero(master.hspeed) && master.hspeed * (transform.position.x - master.transform.position.x) > 0f)
                     initDist = Mathf.Min(Mathf.Abs(master.transform.position.x - transform.position.x) + Mathf.Abs(master.hspeed), (transform.localScale.x * col.size.x / 2 + master.col.size.x + 1f));
 
-                if (!Constants.NearZero(hsum)) master.transform.position = new Vector3(transform.position.x + (master.transform.position.x - transform.position.x < 0f ? -1f : 1f) * (initDist), master.transform.position.y);
-                else transform.position = new Vector3(master.transform.position.x + (master.transform.position.x - transform.position.x < 0f ? 1f : -1f) * (initDist), master.transform.position.y);
+                if (!Constants.NearZero(hsum))
+                    transform.position = new Vector3(master.transform.position.x + (master.transform.position.x - transform.position.x < 0f ? 1f : -1f) * (initDist), master.transform.position.y);
             }
         }
     }
@@ -97,6 +89,6 @@ public class PushableBehaviour : MovableBehaviour
         master.onPush = false;
         master = null;
         initDist = 0f;
-        GetComponent<MovableBehaviour>().hspeed = 0f;
+        hspeed = 0f;
     }
 }

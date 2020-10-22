@@ -20,4 +20,9 @@ public class ObjectBehaviour : MonoBehaviour
             WorldBehaviour.instance.objectGreyPool.Add(this);
         }
     }
+
+    private void OnDestroy()
+    {
+        WorldBehaviour.instance.UnregistObject(this);
+    }
 }

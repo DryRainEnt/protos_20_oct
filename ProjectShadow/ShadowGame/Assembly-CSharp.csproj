@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Behaviour\CharacterBehaviour.cs" />
+    <Compile Include="Assets\Scripts\Behaviour\DoorBehaviour.cs" />
     <Compile Include="Assets\Scripts\Behaviour\FX\Distortion.cs" />
     <Compile Include="Assets\Scripts\Behaviour\FX\FXBase.cs" />
     <Compile Include="Assets\Scripts\Behaviour\InteractableBehaviour.cs" />
@@ -73,8 +74,11 @@
     <Compile Include="Assets\Scripts\Behaviour\PushableBehaviour.cs" />
     <Compile Include="Assets\Scripts\Behaviour\WorldBehaviour.cs" />
     <Compile Include="Assets\Scripts\Constants.cs" />
+    <Compile Include="Assets\Scripts\Controller\DataController.cs" />
     <Compile Include="Assets\Scripts\Controller\DebugController.cs" />
     <Compile Include="Assets\Scripts\Controller\PlayerController.cs" />
+    <Compile Include="Assets\Scripts\Controller\StageController.cs" />
+    <Compile Include="Assets\Scripts\Controller\TilemapGridController.cs" />
     <Compile Include="Assets\Scripts\Utils\FXObjectPool.cs" />
     <Compile Include="Assets\Scripts\Utils\FXPooledObject.cs" />
     <Compile Include="Assets\Scripts\Utils\LimitedLifetime.cs" />

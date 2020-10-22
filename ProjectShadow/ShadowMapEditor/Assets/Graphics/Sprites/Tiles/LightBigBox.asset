@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 13312, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: LightBigBox
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 21300000, guid: d88981560f852b34fa9d7ff2e9a2fb37, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 673c6e189c4f4d04ebf1072f62df8d29, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1

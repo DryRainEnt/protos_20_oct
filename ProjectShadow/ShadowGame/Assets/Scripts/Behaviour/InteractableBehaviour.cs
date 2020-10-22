@@ -21,6 +21,7 @@ public class InteractableBehaviour : MonoBehaviour
     SpriteRenderer fxsr;
     public float fx_offset;
 
+    public bool faceInteract = true;
     public bool interactable;
     public float interactCall;
 
@@ -29,7 +30,7 @@ public class InteractableBehaviour : MonoBehaviour
     {
         col = GetComponent<BoxCollider2D>();
         if (!col) col = gameObject.AddComponent<BoxCollider2D>();
-        else fx_offset = transform.localScale.y * col.size.y + 16;
+        if (fx_offset == 0f) fx_offset = transform.localScale.y * col.size.y + 16;
 
         fx = Resources.Load<GameObject>("Prefabs/FX/FX_Interactable");
         fx = Instantiate(fx, transform.position + Vector3.up * fx_offset, Quaternion.identity, transform);
@@ -65,7 +66,7 @@ public class InteractableBehaviour : MonoBehaviour
                 if (d < dist)
                 {
                     dist = d;
-                    if (!master || (master && master.interact == null && (master.sr.transform.localScale.x * (transform.position.x - master.transform.position.x) > 0f)))
+                    if (!master || (master && master.interact == null && (faceInteract && (master.sr.transform.localScale.x * (transform.position.x - master.transform.position.x) > 0f))))
                     {
                         master = c;
                         SetInteractable();
@@ -74,7 +75,7 @@ public class InteractableBehaviour : MonoBehaviour
             }
         }
 
-        if (dist == 99f || (master.sr.transform.localScale.x * (transform.position.x - master.transform.position.x) < 0f))
+        if (dist == 99f || (faceInteract && (master.sr.transform.localScale.x * (transform.position.x - master.transform.position.x) < 0f)))
         {
             master = null;
             SetNonInteractable();

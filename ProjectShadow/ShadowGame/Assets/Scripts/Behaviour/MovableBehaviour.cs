@@ -12,6 +12,8 @@ public class MovableBehaviour : MonoBehaviour
 
     public bool isLight;
 
+    public bool[] blocked;
+
     public float hspeed;
     public float vspeed;
 
@@ -40,12 +42,12 @@ public class MovableBehaviour : MonoBehaviour
     protected Coroutine DeadRoutine;
 
     // Start is called before the first frame update
-    void Start()
+    public virtual void Start()
     {
         sr = GetComponentInChildren<SpriteRenderer>();
         anim = GetComponentInChildren<Animator>();
         col = GetComponent<BoxCollider2D>();
-
+        blocked = new bool[3] { false, false, false };
         hspeed = 0f;
         vspeed = 0f;
 
@@ -96,6 +98,8 @@ public class MovableBehaviour : MonoBehaviour
         /// vertical movement check
         /// 
         transform.position += Vector3.up * vspeed;
+
+        isGravity = !onLadder;
 
         if (isGravity)
             vspeed += Constants.gravity;
@@ -168,50 +172,73 @@ public class MovableBehaviour : MonoBehaviour
             isLight ? Physics2D.Raycast(transform.position + Vector3.up * (col.size.y - 3), Vector2.right, h_range, (1 << LayerMask.NameToLayer("LightBlock")) | (1 << LayerMask.NameToLayer("GreyBlock")))
             : Physics2D.Raycast(transform.position + Vector3.up * (col.size.y - 3), Vector2.right, h_range, 1 << LayerMask.NameToLayer("ShadowBlock") | (1 << LayerMask.NameToLayer("GreyBlock")));
 
+        if (hhitl) blocked[0] = true; else blocked[0] = false;
+        if (hhitm) blocked[1] = true; else blocked[1] = false;
+        if (hhitu) blocked[2] = true; else blocked[2] = false;
+
         if (!onLadder)
         {
-            if (hhitl || hhitm || hhitu)
+            if (blocked[0] || blocked[1] || blocked[2])
             {
                 if (Constants.NearZero(vspeed) && Constants.NearZero(hspeed))
                 {
                     if (hhitl && Constants.NearZero(hhitl.point.x - transform.position.x))
                     {
                         CheckOverlap();
+                        hspeed = 0f;
                     }
                     else if (hhitm && Constants.NearZero(hhitm.point.x - transform.position.x))
                     {
                         CheckOverlap();
+                        hspeed = 0f;
                     }
                     else if (hhitu && Constants.NearZero(hhitu.point.x - transform.position.x))
                     {
                         CheckOverlap();
+                        hspeed = 0f;
                     }
                 }
 
                 if (!Constants.NearZero(hspeed))
                 {
-                    if (hhitl && !(onPush && hhitm.collider.gameObject.GetComponent<PushableBehaviour>()))
+                    var hhitlp = (hhitl && hhitl.collider.gameObject.GetComponent<PushableBehaviour>()) ? hhitl.collider.gameObject.GetComponent<PushableBehaviour>() : null;
+                    var hhitmp = (hhitm && hhitm.collider.gameObject.GetComponent<PushableBehaviour>()) ? hhitm.collider.gameObject.GetComponent<PushableBehaviour>() : null;
+                    var hhitup = (hhitu && hhitu.collider.gameObject.GetComponent<PushableBehaviour>()) ? hhitu.collider.gameObject.GetComponent<PushableBehaviour>() : null;
+                    if (hhitl)
                     {
-                        transform.position = new Vector3(hhitl.point.x + transform.localScale.x * col.size.x / 2 * Mathf.Sign(-hspeed), transform.position.y);
+                        if (!hhitlp || (hhitlp && !hhitlp.isPushable))
+                        {
+                            transform.position = new Vector3(hhitl.point.x + transform.localScale.x * col.size.x / 2 * Mathf.Sign(-hspeed), transform.position.y);
+                            hspeed = 0f;
+                        }
                     }
-                    else if (hhitm && !(onPush && hhitm.collider.gameObject.GetComponent<PushableBehaviour>()))
+                    else if (hhitm)
                     {
-                        transform.position = new Vector3(hhitm.point.x + transform.localScale.x * col.size.x / 2 * Mathf.Sign(-hspeed), transform.position.y);
-
+                        if (!hhitmp || (hhitmp && !hhitmp.isPushable))
+                        {
+                            transform.position = new Vector3(hhitm.point.x + transform.localScale.x * col.size.x / 2 * Mathf.Sign(-hspeed), transform.position.y);
+                            hspeed = 0f;
+                        }
                     }
-                    else if (hhitu && !(onPush && hhitm.collider.gameObject.GetComponent<PushableBehaviour>()))
+                    else if (hhitu)
                     {
-                        transform.position = new Vector3(hhitu.point.x + transform.localScale.x * col.size.x / 2 * Mathf.Sign(-hspeed), transform.position.y);
+                        if (!hhitup || (hhitup && !hhitup.isPushable))
+                        {
+                            transform.position = new Vector3(hhitu.point.x + transform.localScale.x * col.size.x / 2 * Mathf.Sign(-hspeed), transform.position.y);
+                            hspeed = 0f;
+                        }
                     }
                 }
 
-                hspeed = 0f;
             }
             else
             {
-                if (onPush) PushSlow = 1 / Mathf.Lerp(6, 3, 1 / (interact.size.x * interact.size.y));
+                if (onPush)
+                    PushSlow = 1 / Mathf.Lerp(6, 3, 1 / (interact.size.x * interact.size.y));
             }
         }
+        else
+            hspeed = 0f;
 
         hsum = hspeed;
         transform.position += Vector3.right * hsum * (onPush ? PushSlow : 1);
@@ -241,6 +268,7 @@ public class MovableBehaviour : MonoBehaviour
 
         if (!onLadder)
         {
+            ladderDropCall = 0f;
             if (!Constants.NearZero(ladderGrabCall))
             {
                 if (lhit && ladderGrabCall > 0)
@@ -248,6 +276,8 @@ public class MovableBehaviour : MonoBehaviour
                     onGround = false;
                     onLadder = true;
                     transform.position = new Vector3(lhit.point.x + (lhit.point.x < 0 ? -8 - lhit.point.x % 16 : 8 - lhit.point.x % 16), transform.position.y);
+                    hspeed = 0f;
+                    vspeed = 0f;
                     anim?.SetTrigger("grabLadder");
                 }
                 else if (lvhit && ladderGrabCall < 0 && (ghit && !uhit))
@@ -255,6 +285,8 @@ public class MovableBehaviour : MonoBehaviour
                     onGround = false;
                     onLadder = true;
                     transform.position = new Vector3(lvhit.point.x + (lvhit.point.x < 0 ? -8 - lvhit.point.x % 16 : 8 - lvhit.point.x % 16), transform.position.y - col.size.y / 2 - 2);
+                    hspeed = 0f;
+                    vspeed = 0f;
                     anim?.SetTrigger("grabLadder");
                 }
                 else if (lvhit && ladderGrabCall < 0 && !onGround)
@@ -262,6 +294,8 @@ public class MovableBehaviour : MonoBehaviour
                     onGround = false;
                     onLadder = true;
                     transform.position = new Vector3(lvhit.point.x + (lvhit.point.x < 0 ? -8 - lvhit.point.x % 16 : 8 - lvhit.point.x % 16), transform.position.y);
+                    hspeed = 0f;
+                    vspeed = 0f;
                     anim?.SetTrigger("grabLadder");
                 }
             }
@@ -280,8 +314,6 @@ public class MovableBehaviour : MonoBehaviour
                 onLadder = false;
                 vspeed = 0f;
             }
-            if (!lhit && !lvhit)
-                onLadder = false;
             if (vspeed > 0 && !luhit)
             {
                 onLadder = false;
@@ -331,12 +363,12 @@ public class MovableBehaviour : MonoBehaviour
             {
                 bool pushCheck = false;
                 //Debug.LogError(overlap);
-                foreach (Collider2D c2 in overlap)
+                foreach (Collider2D c in overlap)
                 {
-                    var push = c2.GetComponent<PushableBehaviour>();
+                    var push = c.GetComponent<PushableBehaviour>();
                     if (push)
                     {
-                        push.hspeed = Mathf.Sign(c2.transform.position.x - transform.position.x);
+                        push.hspeed = Mathf.Sign(c.transform.position.x - transform.position.x);
                         pushCheck = true;
                     }
                 }
@@ -346,6 +378,8 @@ public class MovableBehaviour : MonoBehaviour
             count++;
             yield return null;
         }
+        if (count == 10)
+            isDead = true;
         DeadRoutine = null;
     }
 

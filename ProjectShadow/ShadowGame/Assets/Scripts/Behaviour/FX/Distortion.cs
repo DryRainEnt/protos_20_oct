@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Distortion : FXBase
 {
-    new protected float duration = 1f;
+    public float maxScale;
+    public float minScale;
 
     protected override void Awake()
     {
@@ -17,9 +18,8 @@ public class Distortion : FXBase
     void Update()
     {
         if (!isOn) return;
-
-        mat.SetFloat("_BumpAmt", Mathf.Max(0, Mathf.Lerp(-10f, 10f, 1f / (timer + 1f))));
-        transform.localScale = Vector3.one * Mathf.Max(0, Mathf.Lerp(960f, 16f, 1f / (timer + 1f)));
+        mat.SetFloat("_BumpAmt", Mathf.Max(0, Mathf.Lerp(-10f, 10f, 1f / (timer * speed + 1f))));
+        transform.localScale = Vector3.one * Mathf.Max(0, Mathf.Lerp(maxScale, minScale, 1f / (timer + 1f)));
         timer += Time.deltaTime;
     }
 }

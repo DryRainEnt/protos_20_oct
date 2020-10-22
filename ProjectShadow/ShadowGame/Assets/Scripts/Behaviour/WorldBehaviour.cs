@@ -57,7 +57,7 @@ public class WorldBehaviour : MonoBehaviour
         isLight = false;
         RefreshObjects();
     }
-
+    
     public void RefreshObjects()
     {
         foreach (ObjectBehaviour obj in objectShiftPool)
@@ -68,13 +68,49 @@ public class WorldBehaviour : MonoBehaviour
 
     public void RefreshObject(ObjectBehaviour obj)
     {
+        if (obj.isGrey) return;
         obj.gameObject.SetActive(obj.isLight == isLight);
+    }
+
+    public void UnregistObject(ObjectBehaviour obj)
+    {
+        if (!obj.isGrey)
+        {
+            if (objectShiftPool.Contains(obj))
+                objectShiftPool.Remove(obj);
+        }
+        else
+        {
+            if (objectGreyPool.Contains(obj))
+                objectGreyPool.Remove(obj);
+        }
+    }
+
+    public void RegistObject(ObjectBehaviour obj)
+    {
+        if (!obj.isGrey)
+        {
+            if (!objectShiftPool.Contains(obj))
+                objectShiftPool.Add(obj);
+        }
+        else
+        {
+            if (!objectGreyPool.Contains(obj))
+                objectGreyPool.Add(obj);
+        }
+        RefreshObject(obj);
     }
 
     public void Distortion(Transform t)
     {
         var path = player.isDead ? "Prefabs/FX/Distortion_sub" : "Prefabs/FX/Distortion";
         FXObjectPool.instance.Instantiate(path, player.isDead ? t.position + Vector3.back * 3f: t.position, t.rotation);
+    }
+
+    public void ItemUse(Transform t)
+    {
+        var path = "Prefabs/FX/Distortion_item";
+        FXObjectPool.instance.Instantiate(path, t.position + Vector3.back * 3f, t.rotation);
     }
 
     public void ScreenShake(float power, float duration, float mult)

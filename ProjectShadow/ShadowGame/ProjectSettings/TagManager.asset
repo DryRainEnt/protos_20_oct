@@ -16,24 +16,24 @@ TagManager:
   - LightCharacter
   - LightBlock
   - LightLadder
-  - 
-  - 
+  - LightInteractables
+  - LightItems
   - 
   - 
   - 
   - ShadowCharacter
   - ShadowBlock
   - ShadowLadder
-  - 
-  - 
+  - ShadowInteractables
+  - ShadowItems
   - 
   - 
   - 
   - GreyCharacter
   - GreyBlock
   - GreyLadder
-  - 
-  - 
+  - GreyInteractables
+  - GreyItems
   - 
   - 
   - 

@@ -16,6 +16,8 @@ public class TilemapGridController : MonoBehaviour
     public InputField Width;
     public InputField Height;
 
+    public Tile startPoint;
+
     public RuleTile lightBlock;
     public RuleTile shadowBlock;
     public RuleTile greyBlock;
@@ -31,7 +33,9 @@ public class TilemapGridController : MonoBehaviour
     public Tile shadowBigBox;
     public Tile greyBigBox;
 
-    public Tile door;
+    public Tile greyDoor;
+    public Tile lightDoor;
+    public Tile shadowDoor;
     public Tile key;
 
     public GameObject prefab;
@@ -68,7 +72,9 @@ public class TilemapGridController : MonoBehaviour
                 for (float j = TilemapBorder.instance.height / 16 * -0.5f - 2; j < TilemapBorder.instance.height / 16 * 0.5f + 2; j++)
                     if (i < TilemapBorder.instance.width / 16 * -0.5f + 1 || i > TilemapBorder.instance.width / 16 * 0.5f - 2
                         || j < TilemapBorder.instance.height / 16 * -0.5f + 1 || j > TilemapBorder.instance.height / 16 * 0.5f - 2)
-                        SetTile(2, new Vector3(i, j), "GreyBlock");
+                    {
+                        DataController.instance.Add(2, new Vector3(i, j), "GreyBlock");
+                    }
         }
 
         firstLayer.isOn = true;
@@ -101,6 +107,8 @@ public class TilemapGridController : MonoBehaviour
         bool eraser = false;
         switch (type)
         {
+            case "StartPoint": tile = startPoint; break;
+
             case "LightBlock": tile = lightBlock; break;
             case "ShadowBlock": tile = shadowBlock; break;
             case "GreyBlock": tile = greyBlock; break;
@@ -115,7 +123,9 @@ public class TilemapGridController : MonoBehaviour
             case "ShadowBigBox": tile = shadowBigBox; break;
             case "GreyBigBox": tile = greyBigBox; break;
 
-            case "Door": tile = door; break;
+            case "GreyDoor": tile = greyDoor; break;
+            case "LightDoor": tile = lightDoor; break;
+            case "ShadowDoor": tile = shadowDoor; break;
             case "Key": tile = key; break;
 
             case "null": eraser = true; break;

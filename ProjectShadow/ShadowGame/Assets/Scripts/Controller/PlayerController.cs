@@ -46,7 +46,8 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         behaviour.interactObjectCall = 0f;
-        
+        behaviour.ladderDropCall = 0f;
+
         if (behaviour.actionStamp < 0 && behaviour.onGround && behaviour.landingStamp < 0)
         {
             if (actionType == ActionType.shift)

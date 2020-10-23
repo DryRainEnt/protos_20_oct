@@ -11,6 +11,7 @@ public class Distortion : FXBase
     {
         base.Awake();
         GetComponent<Renderer>().material = new Material(mat);
+        GetComponent<Renderer>().sortingOrder = 10;
         base.Awake();
     }
 

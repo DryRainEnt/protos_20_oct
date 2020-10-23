@@ -10,7 +10,7 @@ public class TilemapGridController : MonoBehaviour
 
     public Material mat;
 
-    public Toggle firstLayer;
+    public List<Toggle> layerToggles;
     public InputField MapName;
     public InputField Width;
     public InputField Height;
@@ -36,6 +36,14 @@ public class TilemapGridController : MonoBehaviour
     public Tile lightDoor;
     public Tile shadowDoor;
     public Tile key;
+
+    public Tile clearDoor;
+    public Tile clearKey;
+
+    public Tile energy;
+    public Tile lightTrap;
+    public Tile shadowTrap;
+    public Tile greyTrap;
 
     public GameObject prefab;
     public List<Tilemap> layers;
@@ -64,8 +72,8 @@ public class TilemapGridController : MonoBehaviour
             layer.gameObject.name = layerNames[i];
             layers.Add(layer.GetComponent<Tilemap>());
         }
-        
-        firstLayer.isOn = true;
+
+        layerToggles[0].isOn = true;
         TileCursor.instance.SetLayer(0);
     }
 
@@ -94,13 +102,16 @@ public class TilemapGridController : MonoBehaviour
 
     public TileBase GetTile(int layer, Vector2 pos)
     {
-        return layers[layer]?.GetTile(new Vector3Int(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(layers[layer].transform.position.z)));
+        return layers[layer]?.GetTile(new Vector3Int(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), -1));
     }
 
     public void SetTile(int layer, Vector2 pos, string type)
     {
-        if (pos.x < TilemapBorder.instance.width / 16 * -0.5f - 2f || pos.x > TilemapBorder.instance.width / 16 * 0.5f + 2f) return;
-        if (pos.y < TilemapBorder.instance.height / 16 * -0.5f - 2f || pos.y > TilemapBorder.instance.height / 16 * 0.5f + 2f) return;
+        if (type != "null")
+        {
+            if (pos.x < TilemapBorder.instance.width / 16 * -0.5f - 2f || pos.x >= TilemapBorder.instance.width / 16 * 0.5f + 2f) return;
+            if (pos.y < TilemapBorder.instance.height / 16 * -0.5f - 2f || pos.y >= TilemapBorder.instance.height / 16 * 0.5f + 2f) return;
+        }
         if (layer >= 10) layer -= 10;
         TileBase tile = null;
         bool eraser = false;
@@ -127,9 +138,18 @@ public class TilemapGridController : MonoBehaviour
             case "ShadowDoor": tile = shadowDoor; break;
             case "Key": tile = key; break;
 
+            case "ClearDoor": tile = clearDoor; break;
+            case "ClearKey": tile = clearKey; break;
+
+            case "EnergyCan": tile = energy; break;
+            case "LightTrap": tile = lightTrap; break;
+            case "ShadowTrap": tile = shadowTrap; break;
+            case "GreyTrap": tile = greyTrap; break;
+                
             case "null": eraser = true; break;
         }
         var tilepos = new Vector3Int(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), -1);
+        Debug.Log(string.Format("{0} >> [ {1}, {2}, {3} ] >> {4}", layer, tilepos.x, tilepos.y, tilepos.z, type));
         if (eraser)
         {
             layers[layer].SetTile(tilepos, null);
@@ -138,7 +158,6 @@ public class TilemapGridController : MonoBehaviour
         if (tile != null) layers[layer].SetTile(tilepos, tile);
 
         layers[layer].RefreshTile(tilepos);
-        Debug.Log(string.Format("{0} >> [ {1}, {2}, {3} ]", layer, tilepos.x, tilepos.y, tilepos.z));
     }
 
     public void SetTilemapAlpha(int layer, bool alpha)

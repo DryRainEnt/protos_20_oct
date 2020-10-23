@@ -63,7 +63,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Behaviour\CharacterBehaviour.cs" />
+    <Compile Include="Assets\Scripts\Behaviour\DamageBehaviour.cs" />
     <Compile Include="Assets\Scripts\Behaviour\DoorBehaviour.cs" />
+    <Compile Include="Assets\Scripts\Behaviour\EnergyCanBehaviour.cs" />
     <Compile Include="Assets\Scripts\Behaviour\FX\Distortion.cs" />
     <Compile Include="Assets\Scripts\Behaviour\FX\FXBase.cs" />
     <Compile Include="Assets\Scripts\Behaviour\InteractableBehaviour.cs" />
@@ -71,6 +73,7 @@
     <Compile Include="Assets\Scripts\Behaviour\MovableBehaviour.cs" />
     <Compile Include="Assets\Scripts\Behaviour\ObjectBehaviour.cs" />
     <Compile Include="Assets\Scripts\Behaviour\PlayerBehaviour.cs" />
+    <Compile Include="Assets\Scripts\Behaviour\PlayerCameraBehaviour.cs" />
     <Compile Include="Assets\Scripts\Behaviour\PushableBehaviour.cs" />
     <Compile Include="Assets\Scripts\Behaviour\WorldBehaviour.cs" />
     <Compile Include="Assets\Scripts\Constants.cs" />
@@ -79,6 +82,8 @@
     <Compile Include="Assets\Scripts\Controller\PlayerController.cs" />
     <Compile Include="Assets\Scripts\Controller\StageController.cs" />
     <Compile Include="Assets\Scripts\Controller\TilemapGridController.cs" />
+    <Compile Include="Assets\Scripts\Controller\TitleScreenController.cs" />
+    <Compile Include="Assets\Scripts\Utils\DontDestroyOnLoad.cs" />
     <Compile Include="Assets\Scripts\Utils\FXObjectPool.cs" />
     <Compile Include="Assets\Scripts\Utils\FXPooledObject.cs" />
     <Compile Include="Assets\Scripts\Utils\LimitedLifetime.cs" />
@@ -91,6 +96,7 @@
     <None Include="Assets\Special FX Shaders\Shaders\Special FX\Special FX Distortion.shader" />
     <None Include="Assets\StreamingAssets\stages.txt" />
     <None Include="Assets\Special FX Shaders\Shaders\Special FX\Special FX Dissolve Intersection.shader" />
+    <None Include="Assets\Resources\Shaders\ScreenShift.shader" />
     <None Include="Assets\Special FX Shaders\Shaders\Special FX\Air Distortion\Air Distortion - Single.shader" />
     <None Include="Assets\Special FX Shaders\Shaders\Special FX\Air Distortion\Air Distortion - Double.shader" />
     <None Include="Assets\Special FX Shaders\Shaders\Special FX\Special FX.shader" />

@@ -9,6 +9,8 @@ public class ObjectBehaviour : MonoBehaviour
     public bool isLight;
     public bool isGrey;
 
+    public bool wait = false;
+
     private void Start()
     {
         if (!isGrey)

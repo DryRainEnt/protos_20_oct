@@ -18,7 +18,7 @@ TagManager:
   - LightLadder
   - LightInteractables
   - LightItems
-  - 
+  - LightDamage
   - 
   - 
   - ShadowCharacter
@@ -26,7 +26,7 @@ TagManager:
   - ShadowLadder
   - ShadowInteractables
   - ShadowItems
-  - 
+  - ShadowDamage
   - 
   - 
   - GreyCharacter
@@ -34,7 +34,7 @@ TagManager:
   - GreyLadder
   - GreyInteractables
   - GreyItems
-  - 
+  - GreyDamage
   - 
   - 
   m_SortingLayers:

@@ -33,12 +33,16 @@ public class DataController : MonoBehaviour
         List<Token> removeList = new List<Token>();
         foreach (Token token in layer.map)
         {
-            if (token.type == "null") removeList.Add(token);
+            if (token.x < currentMap.Width / 16 * -0.5f - 2f || token.x >= currentMap.Width / 16 * 0.5f + 2f) removeList.Add(token);
+            else if (token.y < currentMap.Height / 16 * -0.5f - 2f || token.y >= currentMap.Height / 16 * 0.5f + 2f) removeList.Add(token);
+            else if (token.type == "null") removeList.Add(token);
+
             if (token.type == "Key") token.name = "Key";
         }
         foreach (Token token in removeList)
         {
-            layer.map.Remove(token);
+            Debug.LogWarning(string.Format("token {0} cleaned up at {1}, {2}", token.name, token.x, token.y));
+            Remove(layer, new Vector2(token.x, token.y));
         }
     }
 
@@ -46,7 +50,10 @@ public class DataController : MonoBehaviour
     {
         foreach(Layer layer in currentMap.Layers())
             CleanUpLayer(layer);
-        WriteFile(Application.streamingAssetsPath, currentMap.Name + ".json", JsonUtility.ToJson(currentMap));
+        currentMap.Name = TilemapGridController.instance.MapName.text;
+        string data = JsonUtility.ToJson(currentMap);
+        var b = WriteFile(Application.streamingAssetsPath, currentMap.Name + ".json", data);
+        Debug.LogWarning(data);
     }
 
     public void LoadJson()
@@ -58,6 +65,8 @@ public class DataController : MonoBehaviour
         TilemapGridController.instance.Initiate();
         TilemapGridController.instance.Width.text = currentMap.Width.ToString();
         TilemapGridController.instance.Height.text = currentMap.Height.ToString();
+        TilemapBorder.instance.width = currentMap.Width;
+        TilemapBorder.instance.height = currentMap.Height;
 
         foreach (Token token in currentMap.LightBlocks.map) TilemapGridController.instance.SetTile(0, new Vector2(token.x, token.y), token.type);
         foreach (Token token in currentMap.ShadowBlocks.map) TilemapGridController.instance.SetTile(1, new Vector2(token.x, token.y), token.type);
@@ -108,6 +117,18 @@ public class DataController : MonoBehaviour
         TilemapGridController.instance.SetTile(layer, pos, "null");
     }
 
+
+    public void Remove(Layer layer, Vector2 pos)
+    {
+        layer.map.RemoveAll(tile => tile.x == pos.x && tile.y == pos.y);
+        TilemapGridController.instance.SetTile(GetIndex(layer), pos, "null");
+    }
+
+    public Token GetTile(int layer, Vector2 pos)
+    {
+        return GetLayer(layer).map.Find(tile => tile.x == pos.x && tile.y == pos.y);
+    }
+
     public static bool WriteFile(string path, string fileName, string data)
     {
         bool retValue = false;
@@ -119,7 +140,7 @@ public class DataController : MonoBehaviour
                 Directory.CreateDirectory(dataPath);
             }
             dataPath = System.IO.Path.Combine(path, fileName);
-            StreamWriter writer = new StreamWriter(dataPath);
+            StreamWriter writer = new StreamWriter(dataPath, false);
             try
             {
                 writer.WriteLine(data);
@@ -170,6 +191,32 @@ public class DataController : MonoBehaviour
             data = "";
         }
         return retValue;
+    }
+
+    public Layer GetLayer(int layer)
+    {
+        Layer target;
+        switch (layer)
+        {
+            case 0: target = currentMap.LightBlocks; break;
+            case 1: target = currentMap.ShadowBlocks; break;
+            case 2: target = currentMap.GreyBlocks; break;
+            case 3: target = currentMap.LightLadders; break;
+            case 4: target = currentMap.ShadowLadders; break;
+            case 5: target = currentMap.GreyLadders; break;
+            default: target = currentMap.Gimmicks; break;
+        }
+        return target;
+    }
+
+    public int GetIndex(Layer layer)
+    {
+        for (int i = 0; i < 7; i++)
+        {
+            if (GetLayer(i) == layer) return i;
+        }
+
+        return 6;
     }
 
 }
@@ -229,19 +276,10 @@ public class Token
     public int x;
     public int y;
     public string type;
-
-    public Token(Vector2 pos, string type)
+    
+    public Token(Vector2 pos, string type, string name = "", string target = "none")
     {
-        this.name = type;
-        this.target = "none";
-        this.x = Mathf.FloorToInt(pos.x);
-        this.y = Mathf.FloorToInt(pos.y);
-        this.type = type;
-    }
-
-    public Token(Vector2 pos, string type, string name, string target = "none")
-    {
-        this.name = name;
+        this.name = name == "" ? type : name;
         this.target = target;
         this.x = Mathf.FloorToInt(pos.x);
         this.y = Mathf.FloorToInt(pos.y);

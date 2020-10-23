@@ -35,6 +35,9 @@ public class TilemapBorder : MonoBehaviour
         int.TryParse(Width.text, out width);
         int.TryParse(Height.text, out height);
 
+        DataController.instance.currentMap.Width = width;
+        DataController.instance.currentMap.Height = height;
+
         lineRenderer.SetPositions(
             new Vector3[] {
                 new Vector3(-width / 2, -height / 2, -3),

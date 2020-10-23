@@ -142,7 +142,7 @@ TilemapRenderer:
   m_SortOrder: 0
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
-  m_MaskInteraction: 0
+  m_MaskInteraction: 2
 --- !u!19719996 &-1577936461324016773
 TilemapCollider2D:
   m_ObjectHideFlags: 0
@@ -171,5 +171,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06db5375340b00e42ad4048c49ee9b82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  target: 
   isLight: 0
   isGrey: 0

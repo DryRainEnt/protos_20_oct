@@ -54,6 +54,12 @@ public class MovableBehaviour : MonoBehaviour
         isDead = false;
     }
 
+    public virtual void OnDamage(float damage)
+    {
+        if (damage > 0)
+            isDead = true;
+    }
+
     // Update is called once per frame
     public virtual void Update()
     {
@@ -322,7 +328,22 @@ public class MovableBehaviour : MonoBehaviour
         }
 
         #endregion
-        
+
+        #region DamagedBehaviour
+
+        var damageOverlap = Physics2D.OverlapBoxAll(transform.position + Vector3.up * col.size.y / 2, col.size - new Vector2(2, 2), 0,
+            1 << LayerMask.NameToLayer("LightDamage") | 1 << LayerMask.NameToLayer("ShadowDamage") | 1 << LayerMask.NameToLayer("GreyDamage"));
+
+        if (damageOverlap.Length > 0)
+        {
+            foreach(Collider2D c in damageOverlap)
+            {
+                if (c.GetComponent<DamageBehaviour>()) OnDamage(c.GetComponent<DamageBehaviour>().damage);
+            }
+        }
+
+        #endregion
+
         transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, -3f);
         vsum = vspeed;
         hsum = hspeed;

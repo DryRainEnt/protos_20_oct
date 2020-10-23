@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using TMPro;
 
 public class TileCursor : MonoBehaviour
 {
+    public int mode;
+
     public static TileCursor instance;
     SpriteRenderer sr;
     public string Tilename = "null";
@@ -15,11 +18,17 @@ public class TileCursor : MonoBehaviour
     public InputField tileName;
     public InputField tileTarget;
 
+    public TextMeshPro targetName;
+    public TextMeshPro targetTarget;
+    public TextMeshPro targetX;
+    public TextMeshPro targetY;
+    
     // Start is called before the first frame update
     void Start()
     {
         instance = this;
         sr = GetComponentInChildren<SpriteRenderer>();
+        mode = 1;
     }
 
     // Update is called once per frame
@@ -33,37 +42,98 @@ public class TileCursor : MonoBehaviour
         if (!Input.GetKey(KeyCode.LeftShift)) pos = new Vector2(Mathf.FloorToInt(pos.x / 16), Mathf.FloorToInt(pos.y / 16));
         else pos = new Vector2(pos.x / 16, pos.y / 16);
         sr.transform.position = new Vector3(pos.x * 16 + 8, pos.y * 16 + 8, -5);
-        
-        if (Input.GetMouseButtonDown(0) && IsPointerOverUIElement())
+
+        Token token = DataController.instance.GetTile(targetLayer, pos);
+        if (token != null)
         {
-            tileControl = false;
+            targetName.text = token.name;
+            targetTarget.text = token.target;
+            targetX.text = token.x.ToString();
+            targetY.text = token.y.ToString();
+        }
+        else
+        {
+            targetName.text = "";
+            targetTarget.text = "";
+            targetX.text = "";
+            targetY.text = "";
         }
 
-        if (Input.GetMouseButtonUp(0))
-        {
-            tileControl = true;
-        }
-
-        if (Input.GetMouseButton(0) && tileControl)
-        {
-            DataController.instance.Add(targetLayer, pos, Tilename, tileName.text, tileTarget.text);
-        }
-
-        if (Input.GetMouseButton(1) && tileControl)
-        {
-            DataController.instance.Add(targetLayer, pos, "null");
-        }
-
-        if (Input.GetMouseButtonDown(2))
+        if (mode == 0)
         {
             sr.enabled = false;
-            Cursor.visible = false;
+
+            if (Input.GetMouseButtonDown(0) && IsPointerOverUIElement())
+            {
+                tileControl = false;
+            }
+
+            if (Input.GetMouseButtonUp(0))
+            {
+                tileControl = true;
+            }
+
+            if (Input.GetMouseButton(0) && tileControl)
+            {
+                tileName.text = targetName.text;
+                targetName.text = targetTarget.text;
+            }
         }
-        if (Input.GetMouseButtonUp(2))
+        else if (mode == 1)
         {
             sr.enabled = true;
             Cursor.visible = true;
+
+            if (Input.GetMouseButtonDown(0) && IsPointerOverUIElement())
+            {
+                tileControl = false;
+            }
+
+            if (Input.GetMouseButtonUp(0))
+            {
+                tileControl = true;
+            }
+
+            if (Input.GetMouseButton(0) && tileControl)
+            {
+                DataController.instance.Add(targetLayer, pos, Tilename, tileName.text, tileTarget.text);
+            }
+
+            if (Input.GetMouseButton(1) && tileControl)
+            {
+                DataController.instance.Add(targetLayer, pos, "null");
+            }
+
+            if (Input.GetMouseButton(2))
+            {
+                sr.enabled = false;
+                Cursor.visible = false;
+            }
         }
+        else
+        {
+            sr.enabled = false;
+            if (Input.GetMouseButtonDown(0) && IsPointerOverUIElement())
+            {
+                tileControl = false;
+            }
+
+            if (Input.GetMouseButtonUp(0))
+            {
+                tileControl = true;
+            }
+
+            if (Input.GetMouseButton(0) && tileControl)
+            {
+                DataController.instance.Add(targetLayer, pos, "null");
+            }
+
+        }
+    }
+
+    public void SetMode(int m)
+    {
+        mode = m;
     }
 
     public void SetLayer(int layer)
@@ -80,6 +150,24 @@ public class TileCursor : MonoBehaviour
 
         var button = GameObject.Find(Tilename);
         sr.sprite = button.GetComponentInChildren<Image>().sprite;
+
+        switch (Tilename)
+        {
+            case "LightBlock":
+                TilemapGridController.instance.layerToggles[0].isOn = true; break;
+            case "ShadowBlock":
+                TilemapGridController.instance.layerToggles[1].isOn = true; break;
+            case "GreyBlock":
+                TilemapGridController.instance.layerToggles[2].isOn = true; break;
+            case "LightLadder":
+                TilemapGridController.instance.layerToggles[3].isOn = true; break;
+            case "ShadowLadder":
+                TilemapGridController.instance.layerToggles[4].isOn = true; break;
+            case "GreyLadder":
+                TilemapGridController.instance.layerToggles[5].isOn = true; break;
+            default:
+                TilemapGridController.instance.layerToggles[6].isOn = true; break;
+        }
     }
     
     ///Returns 'true' if we touched or hovering on Unity UI element.

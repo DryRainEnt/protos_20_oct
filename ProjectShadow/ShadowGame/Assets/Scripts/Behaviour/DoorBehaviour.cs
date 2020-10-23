@@ -11,6 +11,7 @@ public class DoorBehaviour : MonoBehaviour
     public Animator anim;
     public BoxCollider2D col;
 
+    public bool isClear;
     public string targetStageName;
 
     public float openTime;
@@ -55,16 +56,28 @@ public class DoorBehaviour : MonoBehaviour
     public void DoorOpenStart(CharacterBehaviour handler)
     {
         if (handler == WorldBehaviour.player)
-            if (WorldBehaviour.player.UseKey())
-                DoorOpenRoutine = StartCoroutine(DoorOpen());
+        {
+            if (isClear)
+            {
+                if (WorldBehaviour.player.UseClearKey())
+                    DoorOpenRoutine = StartCoroutine(DoorOpen());
+            }
+            else
+            {
+                if (WorldBehaviour.player.UseKey())
+                    DoorOpenRoutine = StartCoroutine(DoorOpen());
+            }
+        }
     }
 
     IEnumerator DoorOpen()
     {
+        GetComponent<ObjectBehaviour>().wait = true;
         anim.SetBool("IsOpen", true);
         yield return new WaitForSeconds(openTime);
         isOpen = true;
         DoorOpenRoutine = null;
+        GetComponent<ObjectBehaviour>().wait = false;
     }
 
     public void DoorEnterStart(CharacterBehaviour handler)
@@ -80,7 +93,8 @@ public class DoorBehaviour : MonoBehaviour
             WorldBehaviour.player.transform.position = GameObject.Find(targetDoor).transform.position + Vector3.up * 4;
             var des = GameObject.Find(targetDoor).GetComponent<DoorBehaviour>();
             des.isOpen = true;
-            des.anim.SetTrigger("OpenImmediate");
+            WorldBehaviour.player.lastDoor = des;
+            if (des.anim) des.anim.SetTrigger("OpenImmediate");
 
             if (targetStage != StageController.instance.currentStage)
             {

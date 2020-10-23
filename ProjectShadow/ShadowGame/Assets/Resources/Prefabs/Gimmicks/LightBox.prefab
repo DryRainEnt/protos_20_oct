@@ -69,7 +69,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 66a56f738ba060a49874a6fa0c3275b5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -79,7 +79,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
+  m_MaskInteraction: 2
   m_SpriteSortPoint: 0
 --- !u!1 &4266514532436964184
 GameObject:
@@ -154,6 +154,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06db5375340b00e42ad4048c49ee9b82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  target: 
   isLight: 1
   isGrey: 0
 --- !u!114 &4266514532436963493
@@ -172,6 +173,7 @@ MonoBehaviour:
   target: 2
   size: {x: 1, y: 1}
   fx_offset: 0
+  faceInteract: 1
   interactable: 0
   interactCall: 0
 --- !u!114 &4266514532436963494
@@ -191,6 +193,7 @@ MonoBehaviour:
   col: {fileID: 0}
   isGravity: 1
   isLight: 1
+  blocked: 
   hspeed: 0
   vspeed: 0
   hsum: 0

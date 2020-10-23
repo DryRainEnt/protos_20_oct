@@ -4,11 +4,12 @@
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_Name: Special FX Tile
   m_Shader: {fileID: 4800000, guid: ba204f34246245a489526486b90990fb, type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: ETC1_EXTERNAL_ALPHA
   m_LightmapFlags: 5
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -111,6 +112,9 @@ Material:
     - _Rot1: {r: 0.5, g: 0.5, b: 0, a: 0}
     - _Rot2: {r: 0.5, g: 0.5, b: 0, a: 0}
     - _Rot3: {r: 0.5, g: 0.5, b: 0, a: 0}
+    - _Scale: {r: 1, g: 1, b: 0.5, a: 0.5}
+    - _Scale2: {r: 1, g: 1, b: 0.5, a: 0.5}
+    - _Scale3: {r: 1, g: 1, b: 0.5, a: 0.5}
     - _Tile1: {r: 8, g: 8, b: 24, a: 0}
     - _Tile2: {r: 1, g: 1, b: 0, a: 0}
     - _Tile3: {r: 1, g: 1, b: 0, a: 0}

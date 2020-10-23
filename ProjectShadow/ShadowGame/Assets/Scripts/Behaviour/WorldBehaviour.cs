@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Tilemaps;
 
 public class WorldBehaviour : MonoBehaviour
 {
@@ -16,6 +17,9 @@ public class WorldBehaviour : MonoBehaviour
     public bool isLight;
 
     private Coroutine ScreenShakeRoutine;
+
+    public Transform LightMask;
+    public Transform ShadowMask;
 
     private void Awake()
     {
@@ -32,18 +36,17 @@ public class WorldBehaviour : MonoBehaviour
 
     public void Shift()
     {
-        isLight = !isLight;
-        RefreshObjects();
-        ScreenShake(6f, 0.15f, 0.9f);
-        Distortion(player.transform);
+        Shift(player.gameObject);
     }
 
     public void Shift(GameObject target)
     {
+        StartCoroutine(MaskRoutine(isLight, 0.5f));
         isLight = !isLight;
-        RefreshObjects();
         ScreenShake(6f, 0.15f, 0.9f);
         Distortion(target.transform);
+        TurnOnObjects();
+        MaskSetting();
     }
 
     public void SetLight()
@@ -73,11 +76,73 @@ public class WorldBehaviour : MonoBehaviour
             RefreshObject(obj);
         }
     }
+    
+    public void RefreshBackgrounds()
+    {
+        foreach (ObjectBehaviour obj in objectShiftPool)
+        {
+            if (obj.name.Contains("BackGrounds")) RefreshObject(obj);
+        }
+    }
+
+    public void MaskSetting()
+    {
+        foreach (ObjectBehaviour obj in objectShiftPool)
+        {
+            var sr = obj.GetComponentInChildren<SpriteRenderer>();
+            if (sr)
+            {
+                sr.maskInteraction = (obj.isLight == isLight ? SpriteMaskInteraction.VisibleInsideMask : SpriteMaskInteraction.VisibleOutsideMask);
+            }
+
+            var tr = obj.GetComponent<TilemapRenderer>();
+            if (tr)
+            {
+                tr.maskInteraction = (obj.isLight == isLight ? SpriteMaskInteraction.VisibleInsideMask : SpriteMaskInteraction.VisibleOutsideMask);
+            }
+
+        }
+    }
+
+    public void TurnOnObject(ObjectBehaviour obj)
+    {
+        obj.gameObject.SetActive(true);
+    }
+
+    public void TurnOffObject(ObjectBehaviour obj)
+    {
+        obj.gameObject.SetActive(false);
+    }
+
+    public void TurnOnObjects()
+    {
+        foreach (ObjectBehaviour obj in objectShiftPool)
+        {
+            TurnOnObject(obj);
+        }
+    }
 
     public void RefreshObject(ObjectBehaviour obj)
     {
         if (obj.isGrey) return;
-        obj.gameObject.SetActive(obj.isLight == isLight);
+        if (obj.wait)
+            StartCoroutine(WaitForRefresh(obj));
+        else
+            obj.gameObject.SetActive(obj.isLight == isLight);
+    }
+
+    IEnumerator WaitForRefresh(ObjectBehaviour obj)
+    {
+        var sr = obj.GetComponentInChildren<SpriteRenderer>();
+        if (sr) sr.enabled = false;
+
+        while (obj.wait)
+        {
+            yield return null;
+        }
+
+        if (sr) sr.enabled = true;
+        RefreshObject(obj);
     }
 
     public void UnregistObject(ObjectBehaviour obj)
@@ -155,5 +220,21 @@ public class WorldBehaviour : MonoBehaviour
         }
         Camera.main.transform.localPosition = initPos;
         ScreenShakeRoutine = null;
+    }
+
+    private IEnumerator MaskRoutine(bool light, float duration = 1f)
+    {
+        LightMask.position = Constants.SetDepth(player.transform.position, 5);
+        ShadowMask.position = Constants.SetDepth(player.transform.position, 5);
+        var timer = 0f;
+        while (timer < duration)
+        {
+            var progress = 2 / (1 + Mathf.Pow(2.414f, 4 - 8 * timer / duration));
+            LightMask.localScale = Vector3.one * progress;
+            ShadowMask.localScale = Vector3.one * progress;
+            timer += Time.deltaTime;
+            yield return null;
+        }
+        RefreshObjects();
     }
 }

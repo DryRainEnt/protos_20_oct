@@ -49,7 +49,7 @@ public class TilemapGridController : MonoBehaviour
             var layer = Instantiate(prefab, currentGrid.transform);
             layer.gameObject.name = layerNames[i];
             layers.Add(layer.GetComponent<Tilemap>());
-            
+            layer.GetComponent<TilemapRenderer>().sortingOrder = (i % 3 == 0 ? 1 : (i % 3 == 1 ? 2 : 3));
         }
         RefreshLayers();
     }
@@ -79,6 +79,7 @@ public class TilemapGridController : MonoBehaviour
         bool isLight = false;
         bool isGrey = true;
         if (type == "null") return;
+        if (type == "Door") type = "StartPoint";
         switch (type)
         {
             case "LightBlock": tile = lightBlock; break;
@@ -104,20 +105,24 @@ public class TilemapGridController : MonoBehaviour
 
         if (layer == 6)
         {
+            string d = "";
             try
             {
                 var obj = Instantiate(Resources.Load<GameObject>(string.Concat("Prefabs/Gimmicks/", type)), pos * 16, Quaternion.identity, layers[layer].transform).GetComponent<ObjectBehaviour>();
                 obj.gameObject.name = name == "" ? type : name;
+                d = obj.gameObject.name;
                 obj.target = target;
                 obj.isLight = isLight;
                 obj.isGrey = isGrey;
+                var osr = obj.GetComponentInChildren<SpriteRenderer>();
+                if (osr) osr.sortingOrder = isLight ? 1 : isGrey ? 3 : 2;
 
-                if (type.Contains("Door"))
+                if (type.Contains("Door") || type.Contains("StartPoint"))
                 {
                     StageDoorPool.instance.stageDoorPool.Add(obj.gameObject.name, MapName);
                 }
             }
-            catch(System.ArgumentException) { Debug.LogError(string.Concat("Prefabs/Gimmicks/", type)); }
+            catch(System.ArgumentException) { Debug.LogError(string.Concat("Prefabs/Gimmicks/", d)); }
         }
         else if (tile != null) layers[layer].SetTile(new Vector3Int(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(layers[layer].transform.position.z)), tile);
     }

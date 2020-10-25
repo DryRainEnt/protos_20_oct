@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Tilemaps;
 
-public class WorldBehaviour : MonoBehaviour
+public class WorldBehaviour : ILoadableBehaviour
 {
     public static WorldBehaviour instance;
     public static PlayerBehaviour player;
@@ -28,8 +28,11 @@ public class WorldBehaviour : MonoBehaviour
     }
 
     // Start is called before the first frame update
-    void Start()
+    public override IEnumerator Start()
     {
+        yield return StartCoroutine(base.Start());
+        yield return null;
+
         isLight = true;
         RefreshObjects();
     }

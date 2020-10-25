@@ -91,9 +91,17 @@ public class DoorBehaviour : MonoBehaviour
     {
         if (handler == WorldBehaviour.player)
         {
-            var targetStage = StageDoorPool.instance.stageDoorPool[GetComponent<ObjectBehaviour>().target];
-            var targetDoor = GetComponent<ObjectBehaviour>().target;
 
+            var targetDoor = GetComponent<ObjectBehaviour>().target;
+            
+            if (!StageDoorPool.instance.stageDoorPool.ContainsKey(GetComponent<ObjectBehaviour>().target) || targetDoor == "" || targetDoor == "StageClear")
+            {
+                SystemController.instance.FinishGame();
+                return;
+            }
+
+            var targetStage = StageDoorPool.instance.stageDoorPool[GetComponent<ObjectBehaviour>().target];
+            
             if (!StageController.instance.stages[targetStage].activeInHierarchy)
                 StageController.instance.ActivateStage(targetStage);
 
@@ -107,6 +115,7 @@ public class DoorBehaviour : MonoBehaviour
             if (targetStage != StageController.instance.currentStage)
             {
                 StageController.instance.SetCurrentStage(targetStage);
+                WorldBehaviour.player.lastSave = des;
             }
 
         }

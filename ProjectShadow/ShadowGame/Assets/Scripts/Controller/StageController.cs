@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
-public class StageController : MonoBehaviour
+public class StageController : ILoadableBehaviour
 {
     public static StageController instance;
 
@@ -20,29 +20,35 @@ public class StageController : MonoBehaviour
     }
 
     // Start is called before the first frame update
-    void Start()
+    public override IEnumerator Start()
+    {
+        StartCoroutine(StageStartRoutine());
+        yield return StartCoroutine(base.Start());
+        yield return null;
+    }
+
+    IEnumerator StageStartRoutine()
     {
         var firstStage = "null";
+        SystemController.instance.stages.Clear();
         foreach (string s in DataController.instance.stages)
         {
             if (firstStage == "null") firstStage = s;
-            LoadStage(s);
+            yield return LoadStageAsync(s);
         }
+        yield return new WaitUntil(() => !DataController.instance.OnLoad);
+        yield return null;
+        yield return null;
         ActivateStage(firstStage);
         currentStage = firstStage;
         WorldBehaviour.player.ResetPosition();
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
+    
     public bool LoadStage(string name)
     {
         bool res = false;
 
+        SystemController.instance.stages.Add(name);
         string data = "";
         if (DataController.ReadFile(Application.persistentDataPath, name + ".json", out data))
         {
@@ -57,6 +63,28 @@ public class StageController : MonoBehaviour
         Debug.Log(string.Format("Stage [{0}] Loaded", name));
         DeactivateStage(name);
         return res;
+    }
+
+    public Coroutine LoadStageAsync(string name)
+    {
+        return StartCoroutine(LoadStageAsyncRoutine(name));
+    }
+
+    IEnumerator LoadStageAsyncRoutine(string name)
+    {
+        SystemController.instance.stages.Add(name);
+        string data = "";
+        if (DataController.ReadFile(Application.persistentDataPath, name + ".json", out data))
+        {
+            TilemapGridController.instance.MapName = name;
+            var stage = new GameObject();
+            stage.name = name;
+            stages.Add(name, stage);
+            yield return DataController.instance.LoadJsonAsync(data);
+        }
+
+        Debug.Log(string.Format("Stage [{0}] Loaded Async", name));
+        DeactivateStage(name);
     }
     
     public void ActivateStage(string name)

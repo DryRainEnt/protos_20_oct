@@ -8,18 +8,24 @@ public class PlayerBehaviour : CharacterBehaviour
     public List<ItemBehaviour> items;
 
     public DoorBehaviour lastDoor;
+    public DoorBehaviour lastSave;
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         WorldBehaviour.player = this;
         items = new List<ItemBehaviour>();
         
     }
 
-    public override void Start()
+    public override IEnumerator Start()
     {
-        base.Start();
+        yield return StartCoroutine(base.Start());
+        yield return null;
+        actionDelay = 1.5f;
+        actionStamp = 0f;
         anim.Play("LightRevive");
+        PlaySFX("ReviveSFX");
     }
 
     public void ResetPosition()
@@ -38,10 +44,13 @@ public class PlayerBehaviour : CharacterBehaviour
     {
         base.Update();
         transform.position = Constants.SetDepth(transform.position, -7f);
+        if (!Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.R))
+            isDead = true;
     }
     
     protected override IEnumerator Dead()
     {
+        SystemController.instance.deathCount++;
         PlaySFX("DeadSFX");
         actionDelay = 1.5f;
         actionStamp = 0f;

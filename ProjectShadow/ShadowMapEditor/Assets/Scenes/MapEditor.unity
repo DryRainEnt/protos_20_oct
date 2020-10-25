@@ -4614,7 +4614,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 538892483}
-        m_MethodName: LoadJson
+        m_MethodName: ImportJson
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7076,7 +7076,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Load
+  m_Text: Import
 --- !u!222 &985385427
 CanvasRenderer:
   m_ObjectHideFlags: 0

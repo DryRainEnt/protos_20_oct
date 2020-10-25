@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MovableBehaviour : MonoBehaviour
+public class MovableBehaviour : ILoadableBehaviour
 {
     public SpriteRenderer sr;
     public Animator anim;
@@ -43,8 +43,7 @@ public class MovableBehaviour : MonoBehaviour
     public bool isDead = false;
     protected Coroutine DeadRoutine;
 
-    // Start is called before the first frame update
-    public virtual void Start()
+    protected virtual void Awake()
     {
         sr = GetComponentInChildren<SpriteRenderer>();
         anim = GetComponentInChildren<Animator>();
@@ -56,6 +55,13 @@ public class MovableBehaviour : MonoBehaviour
         vspeed = 0f;
 
         isDead = false;
+    }
+
+    // Start is called before the first frame update
+    public override IEnumerator Start()
+    {
+        yield return null;
+        yield return StartCoroutine(base.Start());
     }
 
     public virtual void OnDamage(float damage)
@@ -85,6 +91,8 @@ public class MovableBehaviour : MonoBehaviour
     // Update is called once per frame
     public virtual void Update()
     {
+        if (DataController.instance.OnLoad) return;
+
         if (isDead)
         {
             if (DeadRoutine == null) DeadRoutine = OnDead();
@@ -269,7 +277,7 @@ public class MovableBehaviour : MonoBehaviour
             hspeed = 0f;
 
         hsum = hspeed;
-        transform.position += Vector3.right * hsum * (onPush ? PushSlow : 1);
+        transform.position += Vector3.right * hsum * (onPush ? PushSlow : 1) * (1.0f / Time.deltaTime / 60f);
 
         #endregion
 
@@ -308,7 +316,7 @@ public class MovableBehaviour : MonoBehaviour
                     vspeed = 0f;
                     anim?.SetTrigger("grabLadder");
                 }
-                else if (lvhit && ladderGrabCall < 0 && (ghit && !uhit))
+                else if (lvhit && ladderGrabCall < 0 && (ghit && !uhit) && onGround && Constants.NearZero(hspeed))
                 {
                     onGround = false;
                     onLadder = true;
@@ -347,6 +355,10 @@ public class MovableBehaviour : MonoBehaviour
                 onLadder = false;
                 transform.position += Vector3.up * col.size.y / 2;
             }
+            if (vspeed < 0 && !luhit)
+            {
+                onLadder = false;
+            }
         }
 
         #endregion
@@ -373,6 +385,7 @@ public class MovableBehaviour : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (DataController.instance.OnLoad) return;
         if (!Constants.NearZero(hspeed) && !onPush)
         {
             if (hspeed > 0)

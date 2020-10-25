@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SFXController : MonoBehaviour
+public class SFXController : ILoadableBehaviour
 {
     public static SFXController instance;
 
@@ -34,8 +34,10 @@ public class SFXController : MonoBehaviour
     }
 
     // Start is called before the first frame update
-    void Start()
+    public override IEnumerator Start()
     {
+        yield return StartCoroutine(base.Start());
+        yield return null;
         lightAudio.Play();
         shadowAudio.Play();
         OnShift(0, false);

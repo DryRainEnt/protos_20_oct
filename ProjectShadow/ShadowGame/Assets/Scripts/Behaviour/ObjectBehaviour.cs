@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ObjectBehaviour : MonoBehaviour
+public class ObjectBehaviour : ILoadableBehaviour
 {
+    public string stage;
     public string type;
     public string target;
 
@@ -12,8 +13,10 @@ public class ObjectBehaviour : MonoBehaviour
 
     public bool wait = false;
 
-    private void Start()
+    public override IEnumerator Start()
     {
+        yield return StartCoroutine(base.Start());
+        yield return null;
         if (!isGrey)
         {
             WorldBehaviour.instance.objectShiftPool.Add(this);

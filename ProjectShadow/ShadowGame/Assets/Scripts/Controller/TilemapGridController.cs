@@ -75,7 +75,6 @@ public class TilemapGridController : MonoBehaviour
 
     public void SetTile(int layer, Vector2 pos, string type, string name = "", string target = "none")
     {
-        Debug.Log(pos);
         TileBase tile = null;
         bool isLight = false;
         bool isGrey = true;
@@ -112,6 +111,7 @@ public class TilemapGridController : MonoBehaviour
                 var obj = Instantiate(Resources.Load<GameObject>(string.Concat("Prefabs/Gimmicks/", type)), pos * 16, Quaternion.identity, layers[layer].transform).GetComponent<ObjectBehaviour>();
                 obj.gameObject.name = name == "" ? type : name;
                 obj.type = type;
+                obj.stage = MapName;
                 d = obj.gameObject.name;
                 obj.target = target;
                 obj.isLight = isLight;
@@ -133,33 +133,33 @@ public class TilemapGridController : MonoBehaviour
     {
         var map = DataController.instance.currentMap;
 
-        for (int i = -20; i < map.Width / -32; i++)
+        for (int i = -25; i < map.Width / -32; i++)
         {
             if (map.Height < 480)
-                for (int j = -17; j < map.Height / 32 + 2; j++)
+                for (int j = -20; j < 20; j++)
                     DataController.instance.Add(2, new Vector2(i, j), "GreyBlock");
-            else if (map.Height > 480)
-                for (int j = map.Height / -32 - 2; j < map.Height / 32 + 2; j++)
+            else
+                for (int j = map.Height / -32 - 5; j < map.Height / 32 + 5; j++)
                     DataController.instance.Add(2, new Vector2(i, j), "GreyBlock");
         }
 
-        for (int i = 20; i > map.Width / 32; i--)
+        for (int i = 25; i > map.Width / 32; i--)
         {
             if (map.Height < 480)
-                for (int j = -17; j < map.Height / 32 + 2; j++)
+                for (int j = -20; j < 20; j++)
                     DataController.instance.Add(2, new Vector2(i, j), "GreyBlock");
-            else if (map.Height > 480)
-                for (int j = map.Height / -32 - 2; j < map.Height / 32 + 2; j++)
+            else
+                for (int j = map.Height / -32 - 5; j < map.Height / 32 + 5; j++)
                     DataController.instance.Add(2, new Vector2(i, j), "GreyBlock");
         }
 
-        for (int i = map.Width / -32 - 2; i < map.Width / 32 + 2; i++)
+        for (int i = map.Width / -32 - 5; i < map.Width / 32 + 5; i++)
         {
             if (map.Height < 480)
             {
-                for (int j = -17; j < map.Height / -32; j++)
+                for (int j = -20; j < map.Height / -32; j++)
                     DataController.instance.Add(2, new Vector2(i, j), "GreyBlock");
-                for (int j = 17; j > map.Height / 32; j--)
+                for (int j = 20; j > map.Height / 32; j--)
                     DataController.instance.Add(2, new Vector2(i, j), "GreyBlock");
             }
         }

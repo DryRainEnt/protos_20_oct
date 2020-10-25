@@ -7,16 +7,20 @@ public class PushableBehaviour : MovableBehaviour
     CharacterBehaviour master;
     InteractableBehaviour interactable;
 
+    public Vector3 initPos;
+
     public bool isPushable;
     float initDist;
 
     // Start is called before the first frame update
-   public override void Start()
+   public override IEnumerator Start()
     {
-        base.Start();
-
         interactable = GetComponent<InteractableBehaviour>();
         initDist = 0f;
+        initPos = transform.position;
+        yield return StartCoroutine(base.Start());
+        yield return null;
+
     }
 
     // Update is called once per frame
@@ -66,7 +70,7 @@ public class PushableBehaviour : MovableBehaviour
                     initDist = Mathf.Min(Mathf.Abs(master.transform.position.x - transform.position.x) + Mathf.Abs(master.hspeed), (transform.localScale.x * col.size.x / 2 + master.col.size.x + 1f));
 
                 if (!Constants.NearZero(hsum))
-                    transform.position = new Vector3(master.transform.position.x + (master.transform.position.x - transform.position.x < 0f ? 1f : -1f) * (initDist), master.transform.position.y);
+                    transform.position = new Vector3(master.transform.position.x + (master.transform.position.x - transform.position.x < 0f ? 1f : -1f) * (initDist), transform.position.y);
             }
         }
         

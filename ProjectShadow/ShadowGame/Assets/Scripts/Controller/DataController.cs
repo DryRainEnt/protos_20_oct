@@ -12,10 +12,12 @@ public class DataController : MonoBehaviour
     private AT.SerializableDictionary.SerializableDictionary<string, MapData> Maps;
 
     public string[] stages;
+    public bool OnLoad;
 
     private void Awake()
     {
         instance = this;
+        OnLoad = true;
 
         string dataPath = Application.persistentDataPath;
         if (!Directory.Exists(dataPath))
@@ -44,12 +46,7 @@ public class DataController : MonoBehaviour
 
         Maps = new AT.SerializableDictionary.SerializableDictionary<string, MapData>();
     }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-    }
-
+    
     public void Initiate()
     {
         var grid = TilemapGridController.instance;
@@ -60,24 +57,73 @@ public class DataController : MonoBehaviour
     {
         WriteFile(Application.persistentDataPath, currentMap.Name + ".json", JsonUtility.ToJson(currentMap));
     }
-    
+
     public void LoadJson(string data)
     {
         currentMap = JsonUtility.FromJson<MapData>(data);
         Maps.Add(currentMap.Name, currentMap);
 
         TilemapGridController.instance.Initiate(StageController.instance.stages[currentMap.Name]);
+        for (int i = 0; i < 7; i++)
+            foreach (Token token in currentMap.LightBlocks.map)
+                TilemapGridController.instance.SetTile(0, new Vector2(token.x, token.y), token.type, token.name, token.target);
 
-        foreach (Token token in currentMap.LightBlocks.map) TilemapGridController.instance.SetTile(0, new Vector2(token.x, token.y), token.type, token.name, token.target);
-        foreach (Token token in currentMap.ShadowBlocks.map) TilemapGridController.instance.SetTile(1, new Vector2(token.x, token.y), token.type, token.name, token.target);
-        foreach (Token token in currentMap.GreyBlocks.map) TilemapGridController.instance.SetTile(2, new Vector2(token.x, token.y), token.type, token.name, token.target);
-        foreach (Token token in currentMap.LightLadders.map) TilemapGridController.instance.SetTile(3, new Vector2(token.x, token.y), token.type, token.name, token.target);
-        foreach (Token token in currentMap.ShadowLadders.map) TilemapGridController.instance.SetTile(4, new Vector2(token.x, token.y), token.type, token.name, token.target);
-        foreach (Token token in currentMap.GreyLadders.map) TilemapGridController.instance.SetTile(5, new Vector2(token.x, token.y), token.type, token.name, token.target);
-        foreach (Token token in currentMap.Gimmicks.map) TilemapGridController.instance.SetTile(6, new Vector2(token.x, token.y), token.type, token.name, token.target);
+
+        TilemapGridController.instance.FillBackgrounds();
+        
+        TilemapGridController.instance.RefreshLayers();
+    }
+
+    public Coroutine LoadJsonAsync(string data)
+    {
+        return StartCoroutine(LoadJsonAsyncRoutine(data));
+    }
+
+    IEnumerator LoadJsonAsyncRoutine(string data)
+    {
+        OnLoad = true;
+        currentMap = JsonUtility.FromJson<MapData>(data);
+        Maps.Add(currentMap.Name, currentMap);
+
+        TilemapGridController.instance.Initiate(StageController.instance.stages[currentMap.Name]);
+
+        for (int i = 0; i < 7; i++)
+        {
+            int count = 0;
+            foreach (Token token in currentMap.Layers()[i].map)
+            {
+                TilemapGridController.instance.SetTile(i, new Vector2(token.x, token.y), token.type, token.name, token.target);
+                count++;
+
+                if (count % 30 == 0)
+                    yield return null;
+            }
+        }
+
         TilemapGridController.instance.FillBackgrounds();
 
         TilemapGridController.instance.RefreshLayers();
+        OnLoad = false;
+    }
+
+    public void LoadFromMapData(MapData mapData)
+    {
+        OnLoad = true;
+        currentMap = mapData;
+        TilemapGridController.instance.Initiate(StageController.instance.stages[currentMap.Name]);
+
+        for (int i = 0; i < 7; i++)
+        {
+            foreach (Token token in currentMap.Layers()[i].map)
+            {
+                TilemapGridController.instance.SetTile(i, new Vector2(token.x, token.y), token.type, token.name, token.target);
+            }
+        }
+
+        TilemapGridController.instance.FillBackgrounds();
+
+        TilemapGridController.instance.RefreshLayers();
+        OnLoad = false;
     }
 
     public MapData GetMapData(string name)

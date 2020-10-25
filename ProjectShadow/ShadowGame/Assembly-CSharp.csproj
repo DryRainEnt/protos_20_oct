@@ -70,6 +70,7 @@
     <Compile Include="Assets\Scripts\Behaviour\EnergyCanBehaviour.cs" />
     <Compile Include="Assets\Scripts\Behaviour\FX\Distortion.cs" />
     <Compile Include="Assets\Scripts\Behaviour\FX\FXBase.cs" />
+    <Compile Include="Assets\Scripts\Behaviour\ILoadableBehaviour.cs" />
     <Compile Include="Assets\Scripts\Behaviour\InteractableBehaviour.cs" />
     <Compile Include="Assets\Scripts\Behaviour\ItemBehaviour.cs" />
     <Compile Include="Assets\Scripts\Behaviour\MovableBehaviour.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="Assets\Scripts\Controller\DebugController.cs" />
     <Compile Include="Assets\Scripts\Controller\FadeController.cs" />
     <Compile Include="Assets\Scripts\Controller\PlayerController.cs" />
+    <Compile Include="Assets\Scripts\Controller\ResultController.cs" />
     <Compile Include="Assets\Scripts\Controller\SFXController.cs" />
     <Compile Include="Assets\Scripts\Controller\StageController.cs" />
     <Compile Include="Assets\Scripts\Controller\StageListController.cs" />
@@ -92,6 +94,7 @@
     <Compile Include="Assets\Scripts\Utils\DontDestroyOnLoad.cs" />
     <Compile Include="Assets\Scripts\Utils\FXObjectPool.cs" />
     <Compile Include="Assets\Scripts\Utils\FXPooledObject.cs" />
+    <Compile Include="Assets\Scripts\Utils\ImageAnimation.cs" />
     <Compile Include="Assets\Scripts\Utils\LimitedLifetime.cs" />
     <Compile Include="Assets\Scripts\Utils\SerializableDictionary.cs" />
     <Compile Include="Assets\Scripts\Utils\StageDoorPool.cs" />

@@ -7,13 +7,17 @@ public class FadeController : MonoBehaviour
 {
     public static FadeController instance;
     RawImage FadeBlack;
-    Animator Loading;
+    ImageAnimation Loading;
+    Text Message;
 
     public bool OnFadeRoutine;
+    Coroutine messageRoutine;
 
 
     private void Awake()
     {
+        if (FadeController.instance)
+            Destroy(instance.gameObject);
         instance = this;
     }
 
@@ -21,8 +25,11 @@ public class FadeController : MonoBehaviour
     void Start()
     {
         FadeBlack = GetComponentInChildren<RawImage>();
-        Loading = GetComponentInChildren<Animator>();
+        Loading = GetComponentInChildren<ImageAnimation>();
         Loading.gameObject.SetActive(false);
+
+        Message = GetComponentInChildren<Text>();
+        Message.text = "";
     }
     
     public void FadeOut(float duration)
@@ -70,13 +77,27 @@ public class FadeController : MonoBehaviour
 
     public void LoadingStart()
     {
-        Loading.gameObject.SetActive(false);
-        Loading.SetTrigger("Reset");
+        Loading.gameObject.SetActive(true);
     }
 
     public void LoadingEnd()
     {
-        Loading.ResetTrigger("Reset");
         Loading.gameObject.SetActive(false);
+    }
+
+    public void ErrorMessage(string text)
+    {
+        if (messageRoutine != null)
+        {
+            StopCoroutine(messageRoutine);
+        }
+        messageRoutine = StartCoroutine(ErrorMessageRoutine(text));
+    }
+
+    IEnumerator ErrorMessageRoutine(string text)
+    {
+        Message.text = text;
+        yield return new WaitForSeconds(3);
+        Message.text = "";
     }
 }

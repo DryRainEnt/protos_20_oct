@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Diagnostics;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,15 +14,32 @@ public class StageListController : MonoBehaviour
 
     List<string> stages = new List<string>();
     List<string> activeStages = new List<string>();
+    public int count;
     
     GameObject togglePrefab;
+    List<GameObject> toggles = new List<GameObject>();
     public Text t;
+    public Button b;
 
     private void Awake()
     {
         instance = this;
 
         togglePrefab = Resources.Load<GameObject>(string.Concat("Prefabs/Parents/StageToggle"));
+
+        RefreshMapList();
+    }
+
+    public void RefreshMapList()
+    {
+        stages.Clear();
+        activeStages.Clear();
+        foreach(GameObject obj in toggles)
+        {
+            Destroy(obj);
+        }
+        toggles.Clear();
+
         string dataPath = Application.persistentDataPath;
         if (!Directory.Exists(dataPath))
         {
@@ -32,7 +50,7 @@ public class StageListController : MonoBehaviour
             DirectoryInfo info = new DirectoryInfo(Application.persistentDataPath);
             FileInfo[] files = info.GetFiles();
 
-            foreach(FileInfo file in files)
+            foreach (FileInfo file in files)
             {
                 if (file.Extension == ".json")
                     stages.Add(file.Name.Split('.')[0]);
@@ -49,7 +67,11 @@ public class StageListController : MonoBehaviour
             obj.GetComponentInChildren<Text>().text = stage;
             obj.GetComponent<Toggle>().isOn = false;
             obj.GetComponent<Toggle>().onValueChanged.AddListener(ToggleStage);
+            toggles.Add(obj);
         }
+
+        var rect = GetComponent<RectTransform>();
+        rect.sizeDelta = new Vector2(200, toggles.Count * 30f);
     }
 
     public void ToggleStage(bool onClick)
@@ -88,7 +110,7 @@ public class StageListController : MonoBehaviour
             {
                 string ErrorMessages = "File Write Error\n" + ex.Message;
                 retValue = false;
-                Debug.LogError(ErrorMessages);
+                UnityEngine.Debug.LogError(ErrorMessages);
             }
             return retValue;
         }
@@ -104,10 +126,26 @@ public class StageListController : MonoBehaviour
             data += active + "\n";
         }
         t.text = data;
+        count = activeStages.Count;
     }
 
     public void WriteStages()
     {
         WriteFile(Application.persistentDataPath, "stages.txt", t.text);
     }
+
+    public void OpenDirectory()
+    {
+        OpenFolder(Application.persistentDataPath);
+    }
+
+    private void OpenFolder(string folderPath)
+    {
+        if (!Directory.Exists(folderPath))
+        {
+            Directory.CreateDirectory(folderPath);
+        }
+        Process.Start(folderPath);
+    }
+    
 }

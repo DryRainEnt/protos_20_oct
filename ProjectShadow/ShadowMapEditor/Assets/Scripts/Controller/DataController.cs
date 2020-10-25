@@ -1,9 +1,11 @@
 ﻿using System.IO;
+using System.Diagnostics;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
+using SFB;
 
 public class DataController : MonoBehaviour
 {
@@ -41,7 +43,7 @@ public class DataController : MonoBehaviour
         }
         foreach (Token token in removeList)
         {
-            Debug.LogWarning(string.Format("token {0} cleaned up at {1}, {2}", token.name, token.x, token.y));
+            UnityEngine.Debug.LogWarning(string.Format("token {0} cleaned up at {1}, {2}", token.name, token.x, token.y));
             Remove(layer, new Vector2(token.x, token.y));
         }
     }
@@ -53,13 +55,49 @@ public class DataController : MonoBehaviour
         currentMap.Name = TilemapGridController.instance.MapName.text;
         string data = JsonUtility.ToJson(currentMap);
         var b = WriteFile(Application.persistentDataPath, currentMap.Name + ".json", data);
-        Debug.LogWarning(Application.persistentDataPath);
+        UnityEngine.Debug.LogWarning(Application.persistentDataPath);
     }
 
     public void LoadJson()
     {
         string data = JsonUtility.ToJson(new MapData("", 0, 0));
         ReadFile(Application.persistentDataPath, TilemapGridController.instance.MapName.text + ".json", out data);
+        currentMap = JsonUtility.FromJson<MapData>(data);
+
+        TilemapGridController.instance.Initiate();
+        TilemapGridController.instance.Width.text = currentMap.Width.ToString();
+        TilemapGridController.instance.Height.text = currentMap.Height.ToString();
+        TilemapBorder.instance.width = currentMap.Width;
+        TilemapBorder.instance.height = currentMap.Height;
+
+        foreach (Token token in currentMap.LightBlocks.map) TilemapGridController.instance.SetTile(0, new Vector2(token.x, token.y), token.type);
+        foreach (Token token in currentMap.ShadowBlocks.map) TilemapGridController.instance.SetTile(1, new Vector2(token.x, token.y), token.type);
+        foreach (Token token in currentMap.GreyBlocks.map) TilemapGridController.instance.SetTile(2, new Vector2(token.x, token.y), token.type);
+        foreach (Token token in currentMap.LightLadders.map) TilemapGridController.instance.SetTile(3, new Vector2(token.x, token.y), token.type);
+        foreach (Token token in currentMap.ShadowLadders.map) TilemapGridController.instance.SetTile(4, new Vector2(token.x, token.y), token.type);
+        foreach (Token token in currentMap.GreyLadders.map) TilemapGridController.instance.SetTile(5, new Vector2(token.x, token.y), token.type);
+        foreach (Token token in currentMap.Gimmicks.map) TilemapGridController.instance.SetTile(6, new Vector2(token.x, token.y), token.type);
+
+        TilemapBorder.instance.width = currentMap.Width;
+        TilemapBorder.instance.height = currentMap.Height;
+    }
+
+    public void ImportJson()
+    {
+        OpenFolder(Application.persistentDataPath);
+    }
+
+    private void OpenFolder(string folderPath)
+    {
+        LoadJson(StandaloneFileBrowser.OpenFilePanel("Open File", "", "json", false));
+    }
+
+    public void LoadJson(string[] path)
+    {
+        if (path.Length < 1) return;
+        string data = JsonUtility.ToJson(new MapData("", 0, 0));
+        string dataPath = System.IO.Path.Combine(path);
+        ReadFile(dataPath, out data);
         currentMap = JsonUtility.FromJson<MapData>(data);
 
         TilemapGridController.instance.Initiate();
@@ -151,7 +189,7 @@ public class DataController : MonoBehaviour
             {
                 string ErrorMessages = "File Write Error\n" + ex.Message;
                 retValue = false;
-                Debug.LogError(ErrorMessages);
+                UnityEngine.Debug.LogError(ErrorMessages);
             }
             return retValue;
         }
@@ -182,14 +220,45 @@ public class DataController : MonoBehaviour
                 data = "";
                 string ErrorMessages = "File Write Error\n" + ex.Message;
                 retValue = false;
-                Debug.LogError(ErrorMessages);
+                UnityEngine.Debug.LogError(ErrorMessages);
             }
             return retValue;
         }
         catch (System.Exception)
         {
-            data = "";
+            data = dataPath;
         }
+        UnityEngine.Debug.LogWarning(dataPath);
+        return retValue;
+    }
+
+    public static bool ReadFile(string path, out string data)
+    {
+        bool retValue = false;
+        string dataPath = path;
+        try
+        {
+            StreamReader reader = new StreamReader(dataPath);
+            try
+            {
+                data = reader.ReadLine();
+                reader.Close();
+                retValue = true;
+            }
+            catch (System.Exception ex)
+            {
+                data = "";
+                string ErrorMessages = "File Write Error\n" + ex.Message;
+                retValue = false;
+                UnityEngine.Debug.LogError(ErrorMessages);
+            }
+            return retValue;
+        }
+        catch (System.Exception)
+        {
+            data = dataPath;
+        }
+        UnityEngine.Debug.LogWarning(dataPath);
         return retValue;
     }
 

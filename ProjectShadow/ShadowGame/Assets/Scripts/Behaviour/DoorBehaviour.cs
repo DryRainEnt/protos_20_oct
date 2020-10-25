@@ -6,6 +6,7 @@ public class DoorBehaviour : MonoBehaviour
 {
     CharacterBehaviour master;
     InteractableBehaviour interactable;
+    AudioSource SFX;
 
     public SpriteRenderer sr;
     public Animator anim;
@@ -28,6 +29,10 @@ public class DoorBehaviour : MonoBehaviour
         anim = GetComponentInChildren<Animator>();
         col = gameObject.GetComponent<BoxCollider2D>();
         interactable = GetComponent<InteractableBehaviour>();
+        SFX = gameObject.AddComponent<AudioSource>();
+        SFX.clip = Resources.Load<AudioClip>("Audio/SFX/" + (isClear ? "ClearDoorSFX" : "DoorSFX"));
+        SFX.playOnAwake = false;
+        SFX.loop = false;
 
         isOpen = false;
     }
@@ -72,11 +77,13 @@ public class DoorBehaviour : MonoBehaviour
 
     IEnumerator DoorOpen()
     {
+        SFX.Play();
         GetComponent<ObjectBehaviour>().wait = true;
         anim.SetBool("IsOpen", true);
         yield return new WaitForSeconds(openTime);
         isOpen = true;
         DoorOpenRoutine = null;
+        interactable.faceInteract = false;
         GetComponent<ObjectBehaviour>().wait = false;
     }
 
@@ -93,6 +100,7 @@ public class DoorBehaviour : MonoBehaviour
             WorldBehaviour.player.transform.position = GameObject.Find(targetDoor).transform.position + Vector3.up * 4;
             var des = GameObject.Find(targetDoor).GetComponent<DoorBehaviour>();
             des.isOpen = true;
+            if (des.interactable) des.interactable.faceInteract = false;
             WorldBehaviour.player.lastDoor = des;
             if (des.anim) des.anim.SetTrigger("OpenImmediate");
 

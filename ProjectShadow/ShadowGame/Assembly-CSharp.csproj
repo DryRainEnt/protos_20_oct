@@ -62,6 +62,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\LandingAnimationBehaviour.cs" />
+    <Compile Include="Assets\RunAnimationBehaviour.cs" />
     <Compile Include="Assets\Scripts\Behaviour\CharacterBehaviour.cs" />
     <Compile Include="Assets\Scripts\Behaviour\DamageBehaviour.cs" />
     <Compile Include="Assets\Scripts\Behaviour\DoorBehaviour.cs" />
@@ -79,8 +81,12 @@
     <Compile Include="Assets\Scripts\Constants.cs" />
     <Compile Include="Assets\Scripts\Controller\DataController.cs" />
     <Compile Include="Assets\Scripts\Controller\DebugController.cs" />
+    <Compile Include="Assets\Scripts\Controller\FadeController.cs" />
     <Compile Include="Assets\Scripts\Controller\PlayerController.cs" />
+    <Compile Include="Assets\Scripts\Controller\SFXController.cs" />
     <Compile Include="Assets\Scripts\Controller\StageController.cs" />
+    <Compile Include="Assets\Scripts\Controller\StageListController.cs" />
+    <Compile Include="Assets\Scripts\Controller\SystemController.cs" />
     <Compile Include="Assets\Scripts\Controller\TilemapGridController.cs" />
     <Compile Include="Assets\Scripts\Controller\TitleScreenController.cs" />
     <Compile Include="Assets\Scripts\Utils\DontDestroyOnLoad.cs" />

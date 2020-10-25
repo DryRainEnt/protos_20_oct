@@ -9,6 +9,7 @@ public class DataController : MonoBehaviour
 {
     public static DataController instance;
     public MapData currentMap;
+    private AT.SerializableDictionary.SerializableDictionary<string, MapData> Maps;
 
     public string[] stages;
 
@@ -16,33 +17,32 @@ public class DataController : MonoBehaviour
     {
         instance = this;
 
-        string dataPath = Application.streamingAssetsPath;
+        string dataPath = Application.persistentDataPath;
         if (!Directory.Exists(dataPath))
         {
             Directory.CreateDirectory(dataPath);
         }
-        else
+        try
         {
-            try
+            dataPath = System.IO.Path.Combine(Application.persistentDataPath, "stages.txt");
+            StreamReader reader = new StreamReader(dataPath);
+
+            int count = int.Parse(reader.ReadLine());
+            List<string> list = new List<string>();
+            for (int i = 0; i < count; i++)
             {
-                dataPath = System.IO.Path.Combine(Application.streamingAssetsPath, "stages.txt");
-                StreamReader reader = new StreamReader(dataPath);
-            
-                int count = int.Parse(reader.ReadLine());
-                List<string> list = new List<string>();
-                for (int i = 0; i < count; i++)
-                {
-                    list.Add(reader.ReadLine());
-                }
-                reader.Close();
-                stages = list.ToArray();
+                list.Add(reader.ReadLine());
             }
-            catch (System.Exception)
-            {
-                stages = new string[0];
-                WriteFile(Application.streamingAssetsPath, "stages.txt", "0");
-            }
+            reader.Close();
+            stages = list.ToArray();
         }
+        catch (System.Exception)
+        {
+            stages = new string[0];
+            WriteFile(Application.persistentDataPath, "stages.txt", "0");
+        }
+
+        Maps = new AT.SerializableDictionary.SerializableDictionary<string, MapData>();
     }
 
     // Start is called before the first frame update
@@ -58,12 +58,13 @@ public class DataController : MonoBehaviour
 
     public void SaveJson()
     {
-        WriteFile(Application.streamingAssetsPath, currentMap.Name + ".json", JsonUtility.ToJson(currentMap));
+        WriteFile(Application.persistentDataPath, currentMap.Name + ".json", JsonUtility.ToJson(currentMap));
     }
     
     public void LoadJson(string data)
     {
         currentMap = JsonUtility.FromJson<MapData>(data);
+        Maps.Add(currentMap.Name, currentMap);
 
         TilemapGridController.instance.Initiate(StageController.instance.stages[currentMap.Name]);
 
@@ -74,8 +75,15 @@ public class DataController : MonoBehaviour
         foreach (Token token in currentMap.ShadowLadders.map) TilemapGridController.instance.SetTile(4, new Vector2(token.x, token.y), token.type, token.name, token.target);
         foreach (Token token in currentMap.GreyLadders.map) TilemapGridController.instance.SetTile(5, new Vector2(token.x, token.y), token.type, token.name, token.target);
         foreach (Token token in currentMap.Gimmicks.map) TilemapGridController.instance.SetTile(6, new Vector2(token.x, token.y), token.type, token.name, token.target);
+        TilemapGridController.instance.FillBackgrounds();
 
         TilemapGridController.instance.RefreshLayers();
+    }
+
+    public MapData GetMapData(string name)
+    {
+        if (Maps.ContainsKey(name)) return Maps[name];
+        else return new MapData("null", 0, 0);
     }
 
     public void Add(int layer, Vector2 pos, string type)

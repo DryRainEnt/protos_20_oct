@@ -13,7 +13,13 @@ public class PlayerBehaviour : CharacterBehaviour
     {
         WorldBehaviour.player = this;
         items = new List<ItemBehaviour>();
+        
+    }
 
+    public override void Start()
+    {
+        base.Start();
+        anim.Play("LightRevive");
     }
 
     public void ResetPosition()
@@ -36,12 +42,12 @@ public class PlayerBehaviour : CharacterBehaviour
     
     protected override IEnumerator Dead()
     {
+        PlaySFX("DeadSFX");
         actionDelay = 1.5f;
         actionStamp = 0f;
         anim.SetBool("Dead", true);
         anim.SetTrigger("Shift");
         WorldBehaviour.instance.ScreenTint.color = new Color(1f, 0f, 0f, 0.3f);
-        Camera.main.backgroundColor = Color.red;
         yield return new WaitForSeconds(0.9f);
         WorldBehaviour.instance.ScreenTint.color = new Color(1f, 0f, 0f, 0f);
         ResetPosition();
@@ -52,6 +58,7 @@ public class PlayerBehaviour : CharacterBehaviour
             WorldBehaviour.player.isLight = !WorldBehaviour.player.isLight;
         }
         yield return new WaitForSeconds(0.6f);
+        PlaySFX("ReviveSFX");
         anim.SetBool("Dead", false);
         onGround = true;
         anim.SetBool("onGround", true);
@@ -77,13 +84,13 @@ public class PlayerBehaviour : CharacterBehaviour
 
     public bool UseKey()
     {
-        var key = items.Find(x => x.name.Contains("Key") && !x.name.Contains("Clear"));
+        var key = items.Find(x => x.type.Contains("Key") && !x.type.Contains("Clear"));
         return UseItem(key);
     }
 
     public bool UseClearKey()
     {
-        var key = items.Find(x => x.name.Contains("ClearKey"));
+        var key = items.Find(x => x.type.Contains("ClearKey"));
         return UseItem(key);
     }
 }

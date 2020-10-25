@@ -5,7 +5,10 @@ using UnityEngine;
 public class ItemBehaviour : MonoBehaviour
 {
     PlayerBehaviour master;
+    public string type;
     CircleCollider2D range;
+    AudioSource sound;
+    AudioClip clip;
     bool isConsumed = false;
     bool isUsed = false;
     public int index = 0;
@@ -13,7 +16,12 @@ public class ItemBehaviour : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        type = GetComponent<ObjectBehaviour>().type;
         range = gameObject.AddComponent<CircleCollider2D>();
+        clip = Resources.Load<AudioClip>("Audio/SFX/" + GetComponent<ObjectBehaviour>().type + "SFX");
+        sound = gameObject.AddComponent<AudioSource>();
+        sound.clip = clip;
+        sound.playOnAwake = false;
     }
 
     public virtual void ConsumedBehaviour()
@@ -40,6 +48,7 @@ public class ItemBehaviour : MonoBehaviour
                     isConsumed = true;
                     transform.localScale = Vector3.one * 0.5f;
                     transform.SetParent(null);
+                    sound.Play();
                 }
             }
         }

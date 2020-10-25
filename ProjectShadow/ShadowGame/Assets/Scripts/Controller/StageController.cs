@@ -22,10 +22,14 @@ public class StageController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        var firstStage = "null";
         foreach (string s in DataController.instance.stages)
+        {
+            if (firstStage == "null") firstStage = s;
             LoadStage(s);
-        ActivateStage(Constants.stages[0]);
-        currentStage = Constants.stages[0];
+        }
+        ActivateStage(firstStage);
+        currentStage = firstStage;
         WorldBehaviour.player.ResetPosition();
     }
 
@@ -40,7 +44,7 @@ public class StageController : MonoBehaviour
         bool res = false;
 
         string data = "";
-        if (DataController.ReadFile(Application.streamingAssetsPath, name + ".json", out data))
+        if (DataController.ReadFile(Application.persistentDataPath, name + ".json", out data))
         {
             TilemapGridController.instance.MapName = name;
             var stage = new GameObject();
@@ -49,16 +53,25 @@ public class StageController : MonoBehaviour
             DataController.instance.LoadJson(data);
             res = true;
         }
+
+        Debug.Log(string.Format("Stage [{0}] Loaded", name));
         DeactivateStage(name);
         return res;
     }
     
     public void ActivateStage(string name)
     {
-        if (!stages.ContainsKey(name)) return;
+        if (!stages.ContainsKey(name))
+        {
+            Debug.Log(string.Format("Stage [{0}] Not in Pool!", name));
+            return;
+        }
         if (currentStage == name) return;
         
         stages[name].SetActive(true);
+        DataController.instance.currentMap = DataController.instance.GetMapData(name);
+
+        Debug.Log(string.Format("Stage [{0}] Activated", name));
     }
 
     public void DeactivateStage(string name)
@@ -67,6 +80,8 @@ public class StageController : MonoBehaviour
         if (currentStage == name) return;
         
         stages[name].SetActive(false);
+
+        Debug.Log(string.Format("Stage [{0}] Deactivated", name));
     }
 
     public void SetCurrentStage(string name)
@@ -74,5 +89,7 @@ public class StageController : MonoBehaviour
         string temp = currentStage;
         currentStage = name;
         DeactivateStage(temp);
+
+        Debug.Log(string.Format("Now Current Stage is [{0}]", name));
     }
 }

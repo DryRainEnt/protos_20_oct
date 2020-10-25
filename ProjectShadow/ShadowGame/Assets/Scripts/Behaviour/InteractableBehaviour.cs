@@ -47,7 +47,7 @@ public class InteractableBehaviour : MonoBehaviour
     {
         if (master)
         {
-            if (!Constants.NearZero(master.interactObjectCall) && (master.interactObjectCall * (transform.position.x - master.transform.position.x) > 0f))
+            if (!Constants.NearZero(master.interactObjectCall) && ((faceInteract && master.interactObjectCall * (transform.position.x - master.transform.position.x) > 0f) || !faceInteract))
             {
                 Interact(master.interactObjectCall);
                 master.interactObjectCall = 0f;
@@ -66,7 +66,9 @@ public class InteractableBehaviour : MonoBehaviour
                 if (d < dist)
                 {
                     dist = d;
-                    if (!master || (master && master.interact == null || (master && master.interact == null && faceInteract && (master.sr.transform.localScale.x * (transform.position.x - master.transform.position.x) > 0f))))
+                    if (!master || (!master && !faceInteract) ||
+                        (master && master.interact == null && faceInteract && (master.sr.transform.localScale.x * (transform.position.x - master.transform.position.x) >= 0f)) ||
+                        (master && master.interact == null && !faceInteract))
                     {
                         master = c;
                         SetInteractable();
@@ -75,7 +77,7 @@ public class InteractableBehaviour : MonoBehaviour
             }
         }
 
-        if (dist == 99f || (faceInteract && (master.sr.transform.localScale.x * (transform.position.x - master.transform.position.x) < 0f)))
+        if (dist == 99f || (faceInteract && (master.sr.transform.localScale.x * (transform.position.x - master.transform.position.x) <= 0f)))
         {
             master = null;
             SetNonInteractable();

@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class TitleScreenController : MonoBehaviour
 {
     public GameObject menuGroup;
+    public GameObject settingGroup;
     public Button start;
     public RawImage banner;
 
@@ -32,6 +33,7 @@ public class TitleScreenController : MonoBehaviour
         endOpening = true;
         banner.transform.position = new Vector3(banner.transform.position.x, -240f);
         menuGroup.SetActive(true);
+        settingGroup.SetActive(true);
         start.Select();
     }
 
@@ -68,4 +70,5 @@ public class TitleScreenController : MonoBehaviour
         }
 
     }
+
 }

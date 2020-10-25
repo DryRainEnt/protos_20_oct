@@ -8,6 +8,8 @@ public class MovableBehaviour : MonoBehaviour
     public Animator anim;
     public BoxCollider2D col;
 
+    protected AudioSource SFX;
+
     public bool isGravity;
 
     public bool isLight;
@@ -47,6 +49,8 @@ public class MovableBehaviour : MonoBehaviour
         sr = GetComponentInChildren<SpriteRenderer>();
         anim = GetComponentInChildren<Animator>();
         col = GetComponent<BoxCollider2D>();
+        SFX = gameObject.AddComponent<AudioSource>();
+
         blocked = new bool[3] { false, false, false };
         hspeed = 0f;
         vspeed = 0f;
@@ -58,6 +62,24 @@ public class MovableBehaviour : MonoBehaviour
     {
         if (damage > 0)
             isDead = true;
+    }
+
+    public void PlaySFX(string name, bool looped = false, float volume = 1.0f)
+    {
+        SFX.clip = Resources.Load<AudioClip>("Audio/SFX/" + name);
+        SFX.volume = volume;
+        SFX.loop = looped;
+        SFX.Play();
+    }
+
+    public void SetSFX(float volume)
+    {
+        SFX.volume = volume;
+    }
+
+    public void StopSFX()
+    {
+        SFX.Stop();
     }
 
     // Update is called once per frame

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ObjectBehaviour : MonoBehaviour
 {
+    public string type;
     public string target;
 
     public bool isLight;

@@ -75,6 +75,7 @@ public class TilemapGridController : MonoBehaviour
 
     public void SetTile(int layer, Vector2 pos, string type, string name = "", string target = "none")
     {
+        Debug.Log(pos);
         TileBase tile = null;
         bool isLight = false;
         bool isGrey = true;
@@ -110,6 +111,7 @@ public class TilemapGridController : MonoBehaviour
             {
                 var obj = Instantiate(Resources.Load<GameObject>(string.Concat("Prefabs/Gimmicks/", type)), pos * 16, Quaternion.identity, layers[layer].transform).GetComponent<ObjectBehaviour>();
                 obj.gameObject.name = name == "" ? type : name;
+                obj.type = type;
                 d = obj.gameObject.name;
                 obj.target = target;
                 obj.isLight = isLight;
@@ -125,6 +127,42 @@ public class TilemapGridController : MonoBehaviour
             catch(System.ArgumentException) { Debug.LogError(string.Concat("Prefabs/Gimmicks/", d)); }
         }
         else if (tile != null) layers[layer].SetTile(new Vector3Int(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(layers[layer].transform.position.z)), tile);
+    }
+
+    public void FillBackgrounds()
+    {
+        var map = DataController.instance.currentMap;
+
+        for (int i = -20; i < map.Width / -32; i++)
+        {
+            if (map.Height < 480)
+                for (int j = -17; j < map.Height / 32 + 2; j++)
+                    DataController.instance.Add(2, new Vector2(i, j), "GreyBlock");
+            else if (map.Height > 480)
+                for (int j = map.Height / -32 - 2; j < map.Height / 32 + 2; j++)
+                    DataController.instance.Add(2, new Vector2(i, j), "GreyBlock");
+        }
+
+        for (int i = 20; i > map.Width / 32; i--)
+        {
+            if (map.Height < 480)
+                for (int j = -17; j < map.Height / 32 + 2; j++)
+                    DataController.instance.Add(2, new Vector2(i, j), "GreyBlock");
+            else if (map.Height > 480)
+                for (int j = map.Height / -32 - 2; j < map.Height / 32 + 2; j++)
+                    DataController.instance.Add(2, new Vector2(i, j), "GreyBlock");
+        }
+
+        for (int i = map.Width / -32 - 2; i < map.Width / 32 + 2; i++)
+        {
+            if (map.Height < 480)
+            {
+                for (int j = -17; j < map.Height / -32; j++)
+                    DataController.instance.Add(2, new Vector2(i, j), "GreyBlock");
+                for (int j = 17; j > map.Height / 32; j--)
+                    DataController.instance.Add(2, new Vector2(i, j), "GreyBlock");
+            }
+        }
     }
     
     public void RefreshLayers()

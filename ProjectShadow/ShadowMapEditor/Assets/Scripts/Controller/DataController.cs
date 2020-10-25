@@ -52,14 +52,14 @@ public class DataController : MonoBehaviour
             CleanUpLayer(layer);
         currentMap.Name = TilemapGridController.instance.MapName.text;
         string data = JsonUtility.ToJson(currentMap);
-        var b = WriteFile(Application.streamingAssetsPath, currentMap.Name + ".json", data);
-        Debug.LogWarning(data);
+        var b = WriteFile(Application.persistentDataPath, currentMap.Name + ".json", data);
+        Debug.LogWarning(Application.persistentDataPath);
     }
 
     public void LoadJson()
     {
         string data = JsonUtility.ToJson(new MapData("", 0, 0));
-        ReadFile(Application.streamingAssetsPath, TilemapGridController.instance.MapName.text + ".json", out data);
+        ReadFile(Application.persistentDataPath, TilemapGridController.instance.MapName.text + ".json", out data);
         currentMap = JsonUtility.FromJson<MapData>(data);
 
         TilemapGridController.instance.Initiate();

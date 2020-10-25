@@ -44,6 +44,7 @@ public class WorldBehaviour : MonoBehaviour
         StartCoroutine(MaskRoutine(isLight, 0.5f));
         isLight = !isLight;
         ScreenShake(6f, 0.15f, 0.9f);
+        SFXController.instance.OnShift(0.5f, true);
         Distortion(target.transform);
         TurnOnObjects();
         MaskSetting();
@@ -200,25 +201,26 @@ public class WorldBehaviour : MonoBehaviour
         var timer = 0f;
         var upper = true;
         var multiplier = 1f;
-        var initPos = Camera.main.transform.localPosition;
+        var offset = Camera.main.transform.parent.transform;
+        var initPos = Camera.main.transform.parent.transform.position;
         var wait = new WaitForSeconds(0.05f);
         while (timer < duration)
         {
             if (upper)
             {
                 upper = false;
-                Camera.main.transform.localPosition = initPos + Vector3.up * power * multiplier;
+                offset.position = initPos + Vector3.up * power * multiplier;
             }
             else
             {
                 upper = true;
-                Camera.main.transform.localPosition += initPos + Vector3.down * power * multiplier;
+                offset.position = initPos + Vector3.down * power * multiplier;
             }
             multiplier *= mult;
             timer += Time.deltaTime;
             yield return wait;
         }
-        Camera.main.transform.localPosition = initPos;
+        offset.position = initPos;
         ScreenShakeRoutine = null;
     }
 

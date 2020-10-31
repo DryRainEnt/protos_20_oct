@@ -315,6 +315,7 @@ public class MovableBehaviour : ILoadableBehaviour
                     hspeed = 0f;
                     vspeed = 0f;
                     anim?.SetTrigger("grabLadder");
+                    ladderGrabCall = 0;
                 }
                 else if (lvhit && ladderGrabCall < 0 && (ghit && !uhit) && onGround && Constants.NearZero(hspeed))
                 {
@@ -324,6 +325,7 @@ public class MovableBehaviour : ILoadableBehaviour
                     hspeed = 0f;
                     vspeed = 0f;
                     anim?.SetTrigger("grabLadder");
+                    ladderGrabCall = 0;
                 }
                 else if (lvhit && ladderGrabCall < 0 && !onGround)
                 {
@@ -333,6 +335,7 @@ public class MovableBehaviour : ILoadableBehaviour
                     hspeed = 0f;
                     vspeed = 0f;
                     anim?.SetTrigger("grabLadder");
+                    ladderGrabCall = 0;
                 }
             }
         }
@@ -341,7 +344,16 @@ public class MovableBehaviour : ILoadableBehaviour
             if (!Constants.NearZero(ladderDropCall) && !(hhitl || hhitm || hhitu))
             {
                 onLadder = false;
-                transform.position += Mathf.Sign(ladderDropCall) * Vector3.right * 12;
+                var hdist = Mathf.Sign(ladderDropCall) * 12;
+
+                RaycastHit2D hhitld =
+                    isLight ? Physics2D.Raycast(transform.position, Vector2.right, hdist, (1 << LayerMask.NameToLayer("LightBlock")) | (1 << LayerMask.NameToLayer("GreyBlock")))
+                    : Physics2D.Raycast(transform.position, Vector2.right, hdist, 1 << LayerMask.NameToLayer("ShadowBlock") | (1 << LayerMask.NameToLayer("GreyBlock")));
+
+                if (hhitld)
+                    transform.position = hhitld.point + Vector2.right * col.size.x / 2 * -Mathf.Sign(ladderDropCall);
+                else
+                    transform.position += hdist * Vector3.right;
             }
             if (onGround)
             {

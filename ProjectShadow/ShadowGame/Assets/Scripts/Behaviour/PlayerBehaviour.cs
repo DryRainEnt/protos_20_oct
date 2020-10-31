@@ -50,6 +50,7 @@ public class PlayerBehaviour : CharacterBehaviour
     
     protected override IEnumerator Dead()
     {
+        col.enabled = false;
         SystemController.instance.deathCount++;
         PlaySFX("DeadSFX");
         actionDelay = 1.5f;
@@ -73,6 +74,7 @@ public class PlayerBehaviour : CharacterBehaviour
         anim.SetBool("onGround", true);
         anim.ResetTrigger("Shift");
         isDead = false;
+        col.enabled = true;
         DeadRoutine = null;
     }
 
@@ -82,22 +84,22 @@ public class PlayerBehaviour : CharacterBehaviour
         item.index = items.IndexOf(item);
     }
 
-    public bool UseItem(ItemBehaviour item)
+    public ItemBehaviour UseItem(ItemBehaviour item)
     {
-        if (!item) return false;
+        if (!item) return null;
         item.GetUsed();
         bool res = items.Remove(item);
         item.index = items.IndexOf(item);
-        return res;
+        return item;
     }
 
-    public bool UseKey()
+    public ItemBehaviour UseKey()
     {
         var key = items.Find(x => x.type.Contains("Key") && !x.type.Contains("Clear"));
         return UseItem(key);
     }
 
-    public bool UseClearKey()
+    public ItemBehaviour UseClearKey()
     {
         var key = items.Find(x => x.type.Contains("ClearKey"));
         return UseItem(key);

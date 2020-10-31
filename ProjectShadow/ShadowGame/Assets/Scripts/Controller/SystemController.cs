@@ -69,6 +69,14 @@ public class SystemController : MonoBehaviour
                 ResetGame();
             playTime += Time.deltaTime;
         }
+        if (SceneManager.GetActiveScene().name == "TitleScreen")
+        {
+            if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.R))
+            {
+                StageListController.instance.AddInitialStages();
+                StageListController.instance.RefreshMapList();
+            }
+        }
     }
 
     public void ResetGame()
@@ -76,31 +84,111 @@ public class SystemController : MonoBehaviour
         WorldBehaviour.player.lastDoor = WorldBehaviour.player.lastSave;
         WorldBehaviour.player.isDead = true;
 
+        #region ResetObjects
         foreach (ObjectBehaviour obj in WorldBehaviour.instance.objectShiftPool)
         {
+            var isOn = obj.gameObject.activeInHierarchy;
             if (obj.stage != StageController.instance.currentStage) continue;
             obj.gameObject.SetActive(true);
             var push = obj.GetComponent<PushableBehaviour>();
             if (push)
             {
-                push.transform.position = push.initPos;
+                push.GetComponent<ObjectBehaviour>().ResetPosition();
                 push.sr.enabled = true;
                 push.col.enabled = true;
+                WorldBehaviour.instance.ItemUse(push.transform);
             }
+            var door = obj.GetComponent<DoorBehaviour>();
+            if (door && obj.type != "StartPoint")
+            {
+                if (door.isOpen && !(door.isOpen && door.isClear && !door.usedKey))
+                {
+                    door.DoorClose();
+                    WorldBehaviour.instance.ItemUse(door.transform);
+                }
+                if (door.usedKey != null)
+                {
+                    door.usedKey.gameObject.SetActive(true);
+                    door.usedKey.IsUsed = false;
+                    door.usedKey.GetComponentInChildren<SpriteRenderer>().enabled = true;
+                    if (door.usedKey.GetComponent<ObjectBehaviour>().stage == StageController.instance.currentStage)
+                    {
+                        door.usedKey.ItemReset();
+                        door.usedKey.transform.SetParent(StageController.instance.stages[StageController.instance.currentStage].transform.GetChild(0).Find("Gimmicks").transform);
+                        door.usedKey.GetComponent<ObjectBehaviour>().ResetPosition();
+                        WorldBehaviour.instance.ItemUse(door.usedKey.transform);
+                    }
+                    else
+                        WorldBehaviour.player.GetItem(door.usedKey);
+                }
+                door.usedKey = null;
+            }
+            var item = obj.GetComponent<ItemBehaviour>();
+            if (item && isOn)
+            {
+                item.ItemReset();
+                item.transform.SetParent(StageController.instance.stages[StageController.instance.currentStage].transform.GetChild(0).Find("Gimmicks").transform);
+                item.GetComponent<ObjectBehaviour>().ResetPosition();
+                WorldBehaviour.player.items.Remove(item);
+                WorldBehaviour.instance.ItemUse(item.transform);
+            }
+            if (obj.isLight != WorldBehaviour.instance.isLight)
+                obj.gameObject.SetActive(false);
         }
         foreach (ObjectBehaviour obj in WorldBehaviour.instance.objectGreyPool)
         {
+            var isOn = obj.gameObject.activeInHierarchy;
             if (obj.stage != StageController.instance.currentStage) continue;
             obj.gameObject.SetActive(true);
             var push = obj.GetComponent<PushableBehaviour>();
             if (push)
             {
-                push.isDead = false;
-                push.transform.position = push.initPos;
+                push.GetComponent<ObjectBehaviour>().ResetPosition();
                 push.sr.enabled = true;
                 push.col.enabled = true;
+                WorldBehaviour.instance.ItemUse(push.transform);
+            }
+            var door = obj.GetComponent<DoorBehaviour>();
+            if (door && obj.type != "StartPoint")
+            {
+                if (door.isOpen && !(door.isOpen && door.isClear && !door.usedKey))
+                {
+                    door.DoorClose();
+                    WorldBehaviour.instance.ItemUse(door.transform);
+                }
+                if (door.usedKey != null)
+                {
+                    door.usedKey.gameObject.SetActive(true);
+                    door.usedKey.IsUsed = false;
+                    door.usedKey.GetComponentInChildren<SpriteRenderer>().enabled = true;
+                    if (door.usedKey.GetComponent<ObjectBehaviour>().stage == StageController.instance.currentStage)
+                    {
+                        door.usedKey.ItemReset();
+                        door.usedKey.transform.SetParent(StageController.instance.stages[StageController.instance.currentStage].transform.GetChild(0).Find("Gimmicks").transform);
+                        door.usedKey.GetComponent<ObjectBehaviour>().ResetPosition();
+                        WorldBehaviour.instance.ItemUse(door.usedKey.transform);
+                    }
+                    else
+                        WorldBehaviour.player.GetItem(door.usedKey);
+                    door.usedKey = null;
+                }
+            }
+            var item = obj.GetComponent<ItemBehaviour>();
+            if (item && isOn)
+            {
+                item.ItemReset();
+                item.transform.SetParent(StageController.instance.stages[StageController.instance.currentStage].transform.GetChild(0).Find("Gimmicks").transform);
+                item.GetComponent<ObjectBehaviour>().ResetPosition();
+                WorldBehaviour.player.items.Remove(item);
+                WorldBehaviour.instance.ItemUse(item.transform);
+            }
+            else if (item)
+            {
+                item.gameObject.SetActive(false);
             }
         }
+        #endregion
+        
     }
 
     public void FinishGame()

@@ -9,8 +9,11 @@ public class ItemBehaviour : MonoBehaviour
     CircleCollider2D range;
     AudioSource sound;
     AudioClip clip;
-    bool isConsumed = false;
-    bool isUsed = false;
+    private bool isConsumed = false;
+    private bool isUsed = false;
+
+    public bool IsUsed { get { return isUsed; } set { isUsed = value; } }
+    public bool IsConsumed { get { return isConsumed; } set { isConsumed = value; } }
     public int index = 0;
 
     // Start is called before the first frame update
@@ -52,6 +55,14 @@ public class ItemBehaviour : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void ItemReset()
+    {
+        master = null;
+        IsConsumed = false;
+        IsUsed = false;
+        GetComponent<ObjectBehaviour>().ResetPosition();
     }
 
     public void GetUsed()

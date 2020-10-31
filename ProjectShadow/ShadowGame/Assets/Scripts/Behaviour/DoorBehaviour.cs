@@ -17,6 +17,7 @@ public class DoorBehaviour : MonoBehaviour
 
     public float openTime;
 
+    public ItemBehaviour usedKey;
     public bool isOpen;
 
     Coroutine DoorOpenRoutine;
@@ -25,21 +26,39 @@ public class DoorBehaviour : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        sr = GetComponentInChildren<SpriteRenderer>();
-        anim = GetComponentInChildren<Animator>();
-        col = gameObject.GetComponent<BoxCollider2D>();
-        interactable = GetComponent<InteractableBehaviour>();
-        SFX = gameObject.AddComponent<AudioSource>();
-        SFX.clip = Resources.Load<AudioClip>("Audio/SFX/" + (isClear ? "ClearDoorSFX" : "DoorSFX"));
-        SFX.playOnAwake = false;
-        SFX.loop = false;
+        if (!isOpen)
+        {
+            sr = GetComponentInChildren<SpriteRenderer>();
+            anim = GetComponentInChildren<Animator>();
+            col = gameObject.GetComponent<BoxCollider2D>();
+            interactable = GetComponent<InteractableBehaviour>();
+            SFX = gameObject.AddComponent<AudioSource>();
+            SFX.clip = Resources.Load<AudioClip>("Audio/SFX/" + (isClear ? "ClearDoorSFX" : "DoorSFX"));
+            SFX.playOnAwake = false;
+            SFX.loop = false;
 
-        isOpen = false;
+            usedKey = null;
+            isOpen = false;
+        }
     }
 
     // Update is called once per frame
     void Update()
-    {
+    { 
+        if (anim)
+        {
+            if (isOpen)
+            {
+                if (DoorOpenRoutine == null)
+                    anim.SetBool("IsOpen", true);
+            }
+            else
+            {
+                anim.SetBool("IsOpen", false);
+                anim.SetBool("OpenImmediate", false);
+            }
+            
+        }
         if (interactable && !Constants.NearZero(interactable.interactCall))
         {
             if (isOpen)
@@ -64,15 +83,27 @@ public class DoorBehaviour : MonoBehaviour
         {
             if (isClear)
             {
-                if (WorldBehaviour.player.UseClearKey())
+                usedKey = WorldBehaviour.player.UseClearKey();
+                if (usedKey)
+                {
                     DoorOpenRoutine = StartCoroutine(DoorOpen());
+                }
             }
             else
             {
-                if (WorldBehaviour.player.UseKey())
+                usedKey = WorldBehaviour.player.UseKey();
+                if (usedKey)
                     DoorOpenRoutine = StartCoroutine(DoorOpen());
             }
         }
+    }
+
+    public void DoorClose()
+    {
+        anim.SetBool("OpenImmediate", false);
+        anim.SetBool("IsOpen", false);
+        anim.Play(string.Format("{0}Closed", GetComponent<ObjectBehaviour>().type));
+        isOpen = false;
     }
 
     IEnumerator DoorOpen()
@@ -82,6 +113,7 @@ public class DoorBehaviour : MonoBehaviour
         anim.SetBool("IsOpen", true);
         yield return new WaitForSeconds(openTime);
         isOpen = true;
+        anim.SetBool("OpenImmediate", true);
         DoorOpenRoutine = null;
         interactable.faceInteract = false;
         GetComponent<ObjectBehaviour>().wait = false;
@@ -107,10 +139,14 @@ public class DoorBehaviour : MonoBehaviour
 
             WorldBehaviour.player.transform.position = GameObject.Find(targetDoor).transform.position + Vector3.up * 4;
             var des = GameObject.Find(targetDoor).GetComponent<DoorBehaviour>();
-            des.isOpen = true;
             if (des.interactable) des.interactable.faceInteract = false;
+            des.isOpen = true;
             WorldBehaviour.player.lastDoor = des;
-            if (des.anim) des.anim.SetTrigger("OpenImmediate");
+            if (des.anim)
+            {
+                des.anim.SetBool("IsOpen", true);
+                des.anim.SetBool("OpenImmediate", true);
+            }
 
             if (targetStage != StageController.instance.currentStage)
             {
